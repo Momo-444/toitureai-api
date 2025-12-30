@@ -268,14 +268,14 @@ class RapportService:
         # CA mensuel = total des devis signes (ou payes)
         devis_signes = [d for d in devis if parse_statut(d) in SIGNED_STATUSES]
         ca_mensuel = sum(
-            Decimal(str(d.get("total_ttc", 0)))
+            Decimal(str(d.get("montant_ttc", 0)))
             for d in devis_signes
         )
 
         # CA encaisse = devis payes
         devis_payes = [d for d in devis if parse_statut(d) in PAID_STATUSES]
         ca_encaisse = sum(
-            Decimal(str(d.get("total_ttc", 0)))
+            Decimal(str(d.get("montant_ttc", 0)))
             for d in devis_payes
         )
 
@@ -292,7 +292,7 @@ class RapportService:
             if parse_statut(d) not in SIGNED_STATUSES + REFUSED_STATUSES
         ]
         ca_potentiel = sum(
-            Decimal(str(d.get("total_ttc", 0)))
+            Decimal(str(d.get("montant_ttc", 0)))
             for d in devis_attente
         )
 
@@ -330,7 +330,7 @@ class RapportService:
                 }
 
             clients[email]["nb_devis"] += 1
-            clients[email]["montant_total"] += Decimal(str(d.get("total_ttc", 0)))
+            clients[email]["montant_total"] += Decimal(str(d.get("montant_ttc", 0)))
 
         # Trie par montant decroissant
         sorted_clients = sorted(
@@ -361,9 +361,9 @@ class RapportService:
                 email=l.get("email", ""),
                 telephone=l.get("telephone"),
                 ville=l.get("ville"),
-                type_travaux=l.get("type_travaux"),
+                type_travaux=l.get("type_projet"), # Correction: type_projet dans la DB
                 statut=l.get("statut", "nouveau"),
-                score=l.get("score"),
+                score=l.get("score_qualification"), # Correction: score_qualification dans la DB
                 date_creation=datetime.fromisoformat(
                     l["created_at"].replace("Z", "+00:00")
                 )
@@ -385,12 +385,20 @@ class RapportService:
                 except (ValueError, TypeError):
                     pass
 
+            # Gestion du nom client (parfois separe, parfois groupe)
+            prenom = d.get('client_prenom', '')
+            nom = d.get('client_nom', '')
+            if prenom:
+                client_nom = f"{prenom} {nom}".strip()
+            else:
+                client_nom = nom.strip()
+
             result.append(DevisResume(
                 id=d["id"],
                 numero=d.get("numero", "N/A"),
-                client_nom=f"{d.get('client_prenom', '')} {d.get('client_nom', '')}".strip() or "N/A",
+                client_nom=client_nom or "N/A",
                 client_email=d.get("client_email", ""),
-                montant_ttc=Decimal(str(d.get("total_ttc", 0))),
+                montant_ttc=Decimal(str(d.get("montant_ttc", 0))),
                 statut=d.get("statut", "brouillon"),
                 date_creation=datetime.fromisoformat(
                     d["created_at"].replace("Z", "+00:00")
