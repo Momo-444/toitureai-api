@@ -216,8 +216,14 @@ class RapportService:
     def _calculate_lead_kpis(self, leads: list[dict]) -> LeadKPIs:
         """Calcule les KPIs des leads."""
         total = len(leads)
-        gagnes = sum(1 for l in leads if l.get("statut") == "gagne")
-        perdus = sum(1 for l in leads if l.get("statut") == "perdu")
+        
+        # Statuts consideres comme gagnes/succes
+        WON_STATUSES = ["gagne", "gagné", "accepte", "accepté", "transforme", "transformé", "signe", "signé"]
+        # Statuts consideres comme perdus
+        LOST_STATUSES = ["perdu", "refuse", "refusé", "sans_suite", "rejete", "rejeté"]
+        
+        gagnes = sum(1 for l in leads if str(l.get("statut", "")).lower() in WON_STATUSES)
+        perdus = sum(1 for l in leads if str(l.get("statut", "")).lower() in LOST_STATUSES)
         en_cours = total - gagnes - perdus
 
         return LeadKPIs(
@@ -230,9 +236,17 @@ class RapportService:
     def _calculate_devis_kpis(self, devis: list[dict]) -> DevisKPIs:
         """Calcule les KPIs des devis."""
         total = len(devis)
-        signes = sum(1 for d in devis if d.get("statut") in ["signe", "paye"])
-        payes = sum(1 for d in devis if d.get("statut") == "paye")
-        refuses = sum(1 for d in devis if d.get("statut") == "refuse")
+        
+        # Statuts
+        parse_statut = lambda d: str(d.get("statut", "")).lower()
+        
+        PAID_STATUSES = ["paye", "payé", "payes", "payés", "paid"]
+        SIGNED_STATUSES = ["signe", "signé", "signed", "accepte", "accepté"] + PAID_STATUSES
+        REFUSED_STATUSES = ["refuse", "refusé", "rejete", "rejeté", "declined"]
+
+        signes = sum(1 for d in devis if parse_statut(d) in SIGNED_STATUSES)
+        payes = sum(1 for d in devis if parse_statut(d) in PAID_STATUSES)
+        refuses = sum(1 for d in devis if parse_statut(d) in REFUSED_STATUSES)
         en_attente = total - signes - refuses
 
         return DevisKPIs(
@@ -245,30 +259,37 @@ class RapportService:
 
     def _calculate_financial_kpis(self, devis: list[dict]) -> FinancialKPIs:
         """Calcule les KPIs financiers."""
-        # CA mensuel = total des devis signes
-        devis_signes = [d for d in devis if d.get("statut") in ["signe", "paye"]]
+        parse_statut = lambda d: str(d.get("statut", "")).lower()
+        
+        PAID_STATUSES = ["paye", "payé", "payes", "payés", "paid"]
+        SIGNED_STATUSES = ["signe", "signé", "signed", "accepte", "accepté"] + PAID_STATUSES
+        REFUSED_STATUSES = ["refuse", "refusé", "rejete", "rejeté", "declined"]
+
+        # CA mensuel = total des devis signes (ou payes)
+        devis_signes = [d for d in devis if parse_statut(d) in SIGNED_STATUSES]
         ca_mensuel = sum(
             Decimal(str(d.get("total_ttc", 0)))
             for d in devis_signes
         )
 
         # CA encaisse = devis payes
-        devis_payes = [d for d in devis if d.get("statut") == "paye"]
+        devis_payes = [d for d in devis if parse_statut(d) in PAID_STATUSES]
         ca_encaisse = sum(
             Decimal(str(d.get("total_ttc", 0)))
             for d in devis_payes
         )
 
-        # Panier moyen
+        # Panier moyen (sur les devis signes)
         if devis_signes:
             panier_moyen = ca_mensuel / len(devis_signes)
         else:
             panier_moyen = Decimal("0")
 
-        # CA potentiel = devis en attente
+        # CA potentiel = devis en attente (pas signes, pas perdus)
+        # On exclut ceux qui sont deja dans SIGNED ou REFUSED
         devis_attente = [
             d for d in devis
-            if d.get("statut") not in ["signe", "paye", "refuse"]
+            if parse_statut(d) not in SIGNED_STATUSES + REFUSED_STATUSES
         ]
         ca_potentiel = sum(
             Decimal(str(d.get("total_ttc", 0)))
