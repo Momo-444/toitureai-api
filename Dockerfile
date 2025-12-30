@@ -16,16 +16,21 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Repertoire de travail
 WORKDIR /app
 
-# Installation des dependances systeme pour pycairo (requis par xhtml2pdf)
+# Installation des dependances systeme pour WeasyPrint
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
-    gcc \
-    pkg-config \
-    libcairo2-dev \
     python3-dev \
-    meson \
-    ninja-build \
+    python3-pip \
+    python3-setuptools \
+    python3-wheel \
+    python3-cffi \
+    libcairo2 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libgdk-pixbuf2.0-0 \
+    libffi-dev \
+    shared-mime-info \
     curl \
     && rm -rf /var/lib/apt/lists/*
 

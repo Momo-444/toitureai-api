@@ -20,7 +20,7 @@ from pathlib import Path
 from io import BytesIO
 
 from jinja2 import Environment, FileSystemLoader
-from xhtml2pdf import pisa
+
 
 from app.core.config import settings
 from app.core.database import supabase_admin as supabase
@@ -380,7 +380,7 @@ class RapportService:
         return result
 
     async def _generate_pdf(self, rapport: RapportMensuel) -> bytes:
-        """Genere le PDF du rapport avec xhtml2pdf."""
+        """Genere le PDF du rapport avec WeasyPrint."""
         template = jinja_env.get_template("rapport_mensuel.html")
 
         html_content = template.render(
@@ -395,19 +395,10 @@ class RapportService:
             genere_le=rapport.genere_le_formatted
         )
 
-        # Genere le PDF avec xhtml2pdf
-        result = BytesIO()
-        pisa_status = pisa.CreatePDF(
-            src=html_content,
-            dest=result,
-            encoding='utf-8'
-        )
-
-        if pisa_status.err:
-            logger.error(f"Erreur lors de la generation PDF: {pisa_status.err}")
-            raise Exception("Erreur lors de la generation du PDF")
-
-        pdf_bytes = result.getvalue()
+        # Genere le PDF avec WeasyPrint
+        from weasyprint import HTML
+        pdf_bytes = HTML(string=html_content).write_pdf()
+        
         logger.info(f"PDF genere: {len(pdf_bytes)} bytes")
 
         return pdf_bytes

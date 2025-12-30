@@ -10,9 +10,7 @@ FastAPI application avec:
 
 from __future__ import annotations
 
-# IMPORTANT: Patch Python 3.8 DOIT etre importe en premier
-# pour corriger le probleme usedforsecurity avec reportlab/xhtml2pdf
-import app.core.python38_compat  # noqa: F401
+
 
 import logging
 from contextlib import asynccontextmanager
