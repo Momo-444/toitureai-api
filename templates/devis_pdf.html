@@ -464,7 +464,7 @@
 
         <div class="info-card">
             <div class="info-label">Type de Projet</div>
-            <div class="info-value">{{ type_projet | escape_html }}</div>
+            <div class="info-value">{{ type_projet }}</div>
             <div class="info-label" style="margin-top: 12px;">Validité du Devis</div>
             <div class="info-value">{{ validite_jours }} jours</div>
         </div>
@@ -476,32 +476,32 @@
         <div class="client-grid">
             <div class="client-item">
                 <span class="client-label">Nom:</span>
-                <span class="client-value"><strong>{{ client.nom | escape_html }}</strong></span>
+                <span class="client-value"><strong>{{ client.nom }}</strong></span>
             </div>
             <div class="client-item">
                 <span class="client-label">Prénom:</span>
-                <span class="client-value"><strong>{{ client.prenom | escape_html }}</strong></span>
+                <span class="client-value"><strong>{{ client.prenom }}</strong></span>
             </div>
             <div class="client-item">
                 <span class="client-label">Email:</span>
-                <span class="client-value">{{ client.email | escape_html }}</span>
+                <span class="client-value">{{ client.email }}</span>
             </div>
             {% if client.telephone %}
             <div class="client-item">
                 <span class="client-label">Téléphone:</span>
-                <span class="client-value">{{ client.telephone | escape_html }}</span>
+                <span class="client-value">{{ client.telephone }}</span>
             </div>
             {% endif %}
             {% if client.adresse %}
             <div class="client-item">
                 <span class="client-label">Adresse:</span>
-                <span class="client-value">{{ client.adresse | escape_html }}</span>
+                <span class="client-value">{{ client.adresse }}</span>
             </div>
             {% endif %}
             {% if client.ville %}
             <div class="client-item">
                 <span class="client-label">Ville:</span>
-                <span class="client-value">{{ client.ville | escape_html }} {{ client.code_postal | escape_html
+                <span class="client-value">{{ client.ville }} {{ client.code_postal
                     }}</span>
             </div>
             {% endif %}
@@ -523,7 +523,7 @@
             {% for ligne in lignes %}
             <tr>
                 <td style="text-align: center; color: #64748b;">{{ ligne.index }}</td>
-                <td><strong>{{ ligne.designation | escape_html }}</strong></td>
+                <td><strong>{{ ligne.designation }}</strong></td>
                 <td style="text-align: center;">{{ ligne.quantite }} {{ ligne.unite }}</td>
                 <td style="text-align: right;">{{ ligne.prix_unitaire_ht | format_euro }}</td>
                 <td style="text-align: right; font-weight: 600;">{{ ligne.total_ht | format_euro }}</td>
@@ -554,7 +554,7 @@
     {% if notes %}
     <div class="notes-section">
         <h3>📝 Notes Complémentaires</h3>
-        <p>{{ notes | escape_html }}</p>
+        <p>{{ notes }}</p>
     </div>
     {% endif %}
 
@@ -620,8 +620,8 @@
         <div style="margin-top: 40px;">
             <div class="signature-label">Signature du client</div>
             <div class="signature-line"></div>
-            <div class="signature-label" style="margin-top: 8px;">Nom et prénom : {{ client.prenom | escape_html }} {{
-                client.nom | escape_html }}
+            <div class="signature-label" style="margin-top: 8px;">Nom et prénom : {{ client.prenom }} {{
+                client.nom }}
             </div>
             <div class="signature-label">Date : _________________________</div>
         </div>

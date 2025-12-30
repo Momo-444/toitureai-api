@@ -288,7 +288,6 @@ class DevisPDFGenerator:
 
         # Ajoute des filtres personnalises
         self.env.filters["format_euro"] = self._format_euro
-        self.env.filters["escape_html"] = self._escape_html
 
     @staticmethod
     def _format_euro(value: float) -> str:
@@ -297,19 +296,6 @@ class DevisPDFGenerator:
             return "0,00 EUR"
         return f"{value:,.2f} EUR".replace(",", " ").replace(".", ",")
 
-    @staticmethod
-    def _escape_html(value: str) -> str:
-        """Echappe les caracteres HTML."""
-        if not value:
-            return ""
-        return (
-            str(value)
-            .replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-            .replace('"', "&quot;")
-            .replace("'", "&#039;")
-        )
 
     def generate_html(
         self,
