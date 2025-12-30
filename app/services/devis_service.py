@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Optional
 
 from jinja2 import Environment, FileSystemLoader
-from xhtml2pdf import pisa
+
 
 from app.core.config import settings
 from app.core.database import supabase_admin as supabase
@@ -394,7 +394,7 @@ class DevisPDFGenerator:
 
     def html_to_pdf(self, html: str) -> bytes:
         """
-        Convertit du HTML en PDF avec xhtml2pdf.
+        Convertit du HTML en PDF avec WeasyPrint.
 
         Args:
             html: Code HTML du devis
@@ -402,20 +402,13 @@ class DevisPDFGenerator:
         Returns:
             PDF en bytes
         """
-        result = BytesIO()
+        from weasyprint import HTML, CSS
 
-        # Convertit HTML en PDF
-        pisa_status = pisa.CreatePDF(
-            src=html,
-            dest=result,
-            encoding='utf-8'
-        )
+        # Configuration CSS pour WeasyPrint (fonts, etc.)
+        # On peut injecter du CSS extra ici si besoin
+        result = HTML(string=html).write_pdf()
 
-        if pisa_status.err:
-            logger.error(f"Erreur lors de la generation PDF: {pisa_status.err}")
-            raise Exception("Erreur lors de la generation du PDF")
-
-        return result.getvalue()
+        return result
 
     def generate_pdf(
         self,

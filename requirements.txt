@@ -20,7 +20,7 @@ openai
 sendgrid
 
 # PDF Generation
-xhtml2pdf
+weasyprint
 
 # Scheduling
 apscheduler
