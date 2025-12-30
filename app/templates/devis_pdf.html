@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devis {{ numero_devis }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            margin: 2cm 1.5cm;
+            size: A4;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            color: #1e293b;
+            background: #ffffff;
+            line-height: 1.6;
+            font-size: 11pt;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
+        }
+
+        .header-grid {
+            /* WeasyPrint doesn't support grid perfectly, use flex or table if needed but trying block first */
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .logo-section h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-section p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .company-info {
+            text-align: right;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        .company-info p {
+            margin: 2px 0;
+        }
+
+        /* Document Info */
+        .doc-info {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .info-card.highlight {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .devis-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        /* Client Section */
+        .client-section {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .client-section h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .client-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .client-item {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            width: 48%;
+            /* Fallback for grid */
+        }
+
+        .client-label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .client-value {
+            font-size: 12px;
+            color: #1e293b;
+        }
+
+        /* Table */
+        .items-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 24px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .items-table thead th {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 14px 12px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .items-table tbody tr {
+            background: white;
+            transition: background 0.2s;
+        }
+
+        .items-table tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .items-table tbody td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 11px;
+        }
+
+        .items-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Totals Section */
+        .totals-section {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .totals-box {
+            width: 400px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .totals-row:last-child {
+            border-bottom: none;
+        }
+
+        .totals-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .totals-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .totals-final {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .totals-final .totals-label {
+            color: white;
+            font-size: 14px;
+        }
+
+        .totals-final .totals-value {
+            color: white;
+            font-size: 18px;
+        }
+
+        /* Notes */
+        .notes-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            border-radius: 8px;
+        }
+
+        .notes-section h3 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+
+        .notes-section p {
+            font-size: 11px;
+            color: #78350f;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            /* Preserve newlines */
+        }
+
+        /* Validity Alert */
+        .validity-alert {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 2px solid #ef4444;
+            border-radius: 10px;
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .validity-alert strong {
+            font-size: 13px;
+            color: #991b1b;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .validity-alert span {
+            font-size: 16px;
+            font-weight: 700;
+            color: #dc2626;
+        }
+
+        /* Garanties */
+        .garanties-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .garantie-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .garantie-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .garantie-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .garantie-desc {
+            font-size: 9px;
+            color: #64748b;
+        }
+
+        /* Conditions */
+        .conditions-section {
+            margin-top: 40px;
+            padding: 24px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .conditions-section h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .conditions-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .conditions-list li {
+            padding: 10px 0 10px 28px;
+            font-size: 10px;
+            color: #475569;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .conditions-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* Acceptation Section */
+        .acceptation-section {
+            margin: 60px 0 40px;
+            padding: 30px;
+            background: #f0f9ff;
+            border: 3px solid #3b82f6;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .acceptation-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 20px;
+        }
+
+        .acceptation-text {
+            font-size: 12px;
+            color: #475569;
+            margin-bottom: 30px;
+            line-height: 1.7;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .signature-line {
+            border-bottom: 2px solid #1e293b;
+            width: 350px;
+            margin: 30px auto 10px;
+        }
+
+        .signature-label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 50px;
+            padding-top: 24px;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 9px;
+            color: #64748b;
+            margin: 4px 0;
+        }
+
+        .footer strong {
+            color: #1e293b;
+            font-size: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-grid">
+            <div class="logo-section" style="text-align: center;">
+                <img src="{{ entreprise.logo_url }}" alt="Logo ToitureAI"
+                    style="height: 125px; width: auto; max-width: 100%; margin-bottom: 16px; border-radius: 12px;" />
+                <h1>{{ entreprise.nom }}</h1>
+                <p>Expert en Couverture Grand Est</p>
+            </div>
+            <div class="company-info">
+                <p><strong>{{ entreprise.nom }}</strong></p>
+                <p>{{ entreprise.adresse }}</p>
+                <p>📞 {{ entreprise.telephone }}</p>
+                <p>✉️ {{ entreprise.email }}</p>
+                <p>SIRET: {{ entreprise.siret }}</p>
+                <p>TVA Intracom.: {{ entreprise.tva_intracom }}</p>
+                <p>RGE: {{ entreprise.rge }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOCUMENT INFO -->
+    <div class="doc-info">
+        <div class="info-card highlight">
+            <div class="info-label">Numéro de Devis</div>
+            <div class="devis-number">{{ numero_devis }}</div>
+            <div class="info-label" style="margin-top: 12px;">Date d'émission</div>
+            <div class="info-value">{{ today }}</div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-label">Type de Projet</div>
+            <div class="info-value">{{ type_projet | escape_html }}</div>
+            <div class="info-label" style="margin-top: 12px;">Validité du Devis</div>
+            <div class="info-value">{{ validite_jours }} jours</div>
+        </div>
+    </div>
+
+    <!-- CLIENT INFO -->
+    <div class="client-section">
+        <h2>👤 Informations Client</h2>
+        <div class="client-grid">
+            <div class="client-item">
+                <span class="client-label">Nom:</span>
+                <span class="client-value"><strong>{{ client.nom | escape_html }}</strong></span>
+            </div>
+            <div class="client-item">
+                <span class="client-label">Prénom:</span>
+                <span class="client-value"><strong>{{ client.prenom | escape_html }}</strong></span>
+            </div>
+            <div class="client-item">
+                <span class="client-label">Email:</span>
+                <span class="client-value">{{ client.email | escape_html }}</span>
+            </div>
+            {% if client.telephone %}
+            <div class="client-item">
+                <span class="client-label">Téléphone:</span>
+                <span class="client-value">{{ client.telephone | escape_html }}</span>
+            </div>
+            {% endif %}
+            {% if client.adresse %}
+            <div class="client-item">
+                <span class="client-label">Adresse:</span>
+                <span class="client-value">{{ client.adresse | escape_html }}</span>
+            </div>
+            {% endif %}
+            {% if client.ville %}
+            <div class="client-item">
+                <span class="client-label">Ville:</span>
+                <span class="client-value">{{ client.ville | escape_html }} {{ client.code_postal | escape_html
+                    }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ITEMS TABLE -->
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th style="width: 40px; text-align: center;">N°</th>
+                <th>Désignation</th>
+                <th style="width: 100px; text-align: center;">Quantité</th>
+                <th style="width: 120px; text-align: right;">Prix Unit. HT</th>
+                <th style="width: 120px; text-align: right;">Total HT</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ligne in lignes %}
+            <tr>
+                <td style="text-align: center; color: #64748b;">{{ ligne.index }}</td>
+                <td><strong>{{ ligne.designation | escape_html }}</strong></td>
+                <td style="text-align: center;">{{ ligne.quantite }} {{ ligne.unite }}</td>
+                <td style="text-align: right;">{{ ligne.prix_unitaire_ht | format_euro }}</td>
+                <td style="text-align: right; font-weight: 600;">{{ ligne.total_ht | format_euro }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- TOTALS -->
+    <div class="totals-section">
+        <div class="totals-box">
+            <div class="totals-row">
+                <span class="totals-label">Total HT</span>
+                <span class="totals-value">{{ total_ht | format_euro }}</span>
+            </div>
+            <div class="totals-row">
+                <span class="totals-label">TVA ({{ tva_pourcent }}%)</span>
+                <span class="totals-value">{{ total_tva | format_euro }}</span>
+            </div>
+            <div class="totals-row totals-final">
+                <span class="totals-label">Total TTC</span>
+                <span class="totals-value">{{ total_ttc | format_euro }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTES -->
+    {% if notes %}
+    <div class="notes-section">
+        <h3>📝 Notes Complémentaires</h3>
+        <p>{{ notes | escape_html }}</p>
+    </div>
+    {% endif %}
+
+    <!-- VALIDITY ALERT -->
+    <div class="validity-alert">
+        <strong>⚠️ Ce devis est valable jusqu'au</strong>
+        <span>{{ date_validite }}</span>
+    </div>
+
+    <!-- GARANTIES -->
+    <div class="garanties-grid">
+        <div class="garantie-card">
+            <div class="garantie-icon">🛡️</div>
+            <div class="garantie-title">Garantie Décennale</div>
+            <div class="garantie-desc">Assurance Allianz Pro BTP</div>
+        </div>
+        <div class="garantie-card">
+            <div class="garantie-icon">✅</div>
+            <div class="garantie-title">Certifié RGE</div>
+            <div class="garantie-desc">N° {{ entreprise.rge }}</div>
+        </div>
+        <div class="garantie-card">
+            <div class="garantie-icon">📋</div>
+            <div class="garantie-title">Respect des DTU</div>
+            <div class="garantie-desc">Normes professionnelles</div>
+        </div>
+    </div>
+
+    <!-- CONDITIONS -->
+    <div class="conditions-section">
+        <h3>📄 Conditions Générales</h3>
+        <ul class="conditions-list">
+            <li><strong>Modalités de paiement:</strong> 30% à la commande, 40% à mi-chantier, 30% solde à réception des
+                travaux.</li>
+            <li><strong>Délai d'exécution:</strong> Selon planning convenu, sous réserve de disponibilité des matériaux
+                et conditions météorologiques favorables.</li>
+            <li><strong>Garantie décennale:</strong> 10 ans sur les travaux de couverture conformément à la loi
+                Spinetta.</li>
+            <li><strong>Garantie biennale:</strong> 2 ans sur les équipements dissociables (gouttières, etc.).</li>
+            <li><strong>Validité:</strong> Ce devis est valable {{ validite_jours }} jours à compter de la date
+                d'émission.
+            </li>
+            <li><strong>Conformité:</strong> Travaux réalisés selon les Documents Techniques Unifiés (DTU) en vigueur.
+            </li>
+            <li><strong>Aides de l'État:</strong> Éligibilité aux aides MaPrimeRénov' et Éco-PTZ (sous conditions,
+                certification RGE).</li>
+            <li><strong>Assurances:</strong> Nos travaux sont couverts par notre assurance décennale (Allianz Pro BTP).
+            </li>
+        </ul>
+    </div>
+
+    <!-- SECTION ACCEPTATION -->
+    <div class="acceptation-section">
+        <div class="acceptation-title">Acceptation du devis</div>
+        <p class="acceptation-text">
+            Je soussigné(e) accepte les conditions du présent devis et autorise {{ entreprise.nom }} à réaliser les
+            travaux
+            décrits ci-dessus.<br>
+            Le présent devis devient contrat exécutoire dès retour signé (par email, courrier ou remise en mains
+            propres).<br><br>
+            <strong>Mention à reporter de votre main :</strong> "Bon pour accord"
+        </p>
+        <div style="margin-top: 40px;">
+            <div class="signature-label">Signature du client</div>
+            <div class="signature-line"></div>
+            <div class="signature-label" style="margin-top: 8px;">Nom et prénom : {{ client.prenom | escape_html }} {{
+                client.nom | escape_html }}
+            </div>
+            <div class="signature-label">Date : _________________________</div>
+        </div>
+    </div>
+
+    <!-- Signature entreprise -->
+    <div style="margin: 60px 0 40px; text-align: right; font-size: 11px; color: #475569;">
+        <p><strong>Devis établi et validé électroniquement par :</strong></p>
+        <p>{{ entreprise.nom }}<br>
+            Représentée par {{ entreprise.representant }}<br>
+            Le {{ today }}</p>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <p><strong>{{ entreprise.nom }}</strong> - Capital social: {{ entreprise.capital }} - RCS Metz B 123 456 789</p>
+        <p>Siège social: {{ entreprise.adresse }} | 📞 {{ entreprise.telephone }} | ✉️ {{ entreprise.email }}</p>
+        <p style="margin-top: 12px; font-size: 8px; color: #94a3b8;">
+            Document généré automatiquement le {{ today }} - Ne pas jeter sur la voie publique (Loi n°75-633 du
+            15/07/1975)
+        </p>
+    </div>
+
+</body>
+
+</html>

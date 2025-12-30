@@ -201,11 +201,13 @@ async def track_lead(
             }
 
             # Si le prospect clique, c'est un fort signal d'intérêt -> on passe en CHAUD direct
+            # 2025-12-30: On force aussi le score à 100 pour éviter qu'un trigger DB ne le repasse en non-chaud
             update_data.update({
                 "statut": "chaud",
-                "lead_chaud": True
+                "lead_chaud": True,
+                "score_qualification": 100
             })
-            logger.info(f"Lead {lead_id} a cliqué → Passage en CHAUD (Score: {score})")
+            logger.info(f"Lead {lead_id} a cliqué → Passage en CHAUD (Score forcé: 100)")
 
             await lead_repo.update(lead_id, update_data)
             logger.info(f"Tracking click enregistré pour lead {lead_id}")
