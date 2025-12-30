@@ -1,0 +1,698 @@
+const inputData = $input.first().json;
+
+// Récupération des données lead
+const nom = $('Supabase - Get Lead').first().json.nom || 'Client Inconnu';
+const prenom = $('Supabase - Get Lead').first().json.prenom || 'Client Inconnu';
+const email = $('Supabase - Get Lead').first().json.email || 'email@inconnu.fr';
+const telephone = $('Supabase - Get Lead').first().json.telephone || '';
+const adresse = $('Supabase - Get Lead').first().json.adresse || '';
+const ville = $('Supabase - Get Lead').first().json.ville || '';
+const code_postal = $('Supabase - Get Lead').first().json.code_postal || '';
+const type_projet = $('Supabase - Get Lead').first().json.type_projet || 'Projet Inconnu';
+const lead_id = $('Supabase - Get Lead').first().json.id || '';
+
+// Validité
+const validite_jours = inputData.validite_jours || 30;
+const dateValidite = new Date();
+dateValidite.setDate(dateValidite.getDate() + validite_jours);
+const dateValiditeStr = dateValidite.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+// Date du jour
+const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+// Sécurité: échappement HTML
+const escapeHtml = (unsafe) => (unsafe || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+
+// Formatage des montants
+const formatEuro = (n) => {
+  if (n == null || isNaN(Number(n))) return "0,00 €";
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2
+  }).format(Number(n));
+};
+
+// Numéro de devis unique
+const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+const numeroDevis = `DEV-${date}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+
+const clientName = escapeHtml(nom).replace(/[^a-z0-9]/gi, '_').toLowerCase();
+const clientFirstName = escapeHtml(prenom).replace(/[^a-z0-9]/gi, '_').toLowerCase();
+const filename = `devis-${clientFirstName}-${clientName}-${date}.pdf`;
+
+// Construction des lignes de devis
+const rows = (inputData.lignes || []).map((l, idx) => `
+  <tr>
+    <td style="text-align: center; color: #64748b;">${idx + 1}</td>
+    <td><strong>${escapeHtml(l.designation)}</strong></td>
+    <td style="text-align: center;">${l.quantite} ${escapeHtml(l.unite)}</td>
+    <td style="text-align: right;">${formatEuro(l.prix_unitaire_ht)}</td>
+    <td style="text-align: right; font-weight: 600;">${formatEuro(l.total_ht)}</td>
+  </tr>
+`).join('');
+
+// Calcul des totaux
+const total_ht = inputData.total_ht || 0;
+const tva_pourcent = inputData.tva_pourcent || 20;
+const total_tva = inputData.total_tva || (total_ht * tva_pourcent / 100);
+const total_ttc = inputData.total_ttc || (total_ht + total_tva);
+
+// HTML Template complet – tout ton design original + nouvelle section acceptation propre
+const html = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devis ${numeroDevis}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    @page {
+      margin: 2cm 1.5cm;
+      size: A4;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+      color: #1e293b;
+      background: #ffffff;
+      line-height: 1.6;
+      font-size: 11pt;
+    }
+    
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
+    }
+    
+    .header-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: center;
+    }
+    
+    .logo-section h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    
+    .logo-section p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    .company-info {
+      text-align: right;
+      font-size: 11px;
+      line-height: 1.8;
+    }
+    
+    .company-info p {
+      margin: 2px 0;
+    }
+    
+    /* Document Info */
+    .doc-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .info-card {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    
+    .info-card.highlight {
+      border-color: #3b82f6;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    }
+    
+    .info-label {
+      font-size: 11px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .info-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+    
+    .devis-number {
+      font-size: 20px;
+      font-weight: 700;
+      color: #3b82f6;
+    }
+    
+    /* Client Section */
+    .client-section {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+    
+    .client-section h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .client-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    
+    .client-item {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    
+    .client-label {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+    }
+    
+    .client-value {
+      font-size: 12px;
+      color: #1e293b;
+    }
+    
+    /* Table */
+    .items-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 24px 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .items-table thead th {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      padding: 14px 12px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .items-table tbody tr {
+      background: white;
+      transition: background 0.2s;
+    }
+    
+    .items-table tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    
+    .items-table tbody tr:hover {
+      background: #e0f2fe;
+    }
+    
+    .items-table tbody td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 11px;
+    }
+    
+    .items-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    /* Totals Section */
+    .totals-section {
+      margin-top: 30px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    
+    .totals-box {
+      width: 400px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .totals-row:last-child {
+      border-bottom: none;
+    }
+    
+    .totals-label {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+    }
+    
+    .totals-value {
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    
+    .totals-final {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    
+    .totals-final .totals-label {
+      color: white;
+      font-size: 14px;
+    }
+    
+    .totals-final .totals-value {
+      color: white;
+      font-size: 18px;
+    }
+    
+    /* Notes */
+    .notes-section {
+      margin: 30px 0;
+      padding: 20px;
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      border-radius: 8px;
+    }
+    
+    .notes-section h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #92400e;
+      margin-bottom: 8px;
+    }
+    
+    .notes-section p {
+      font-size: 11px;
+      color: #78350f;
+      line-height: 1.6;
+    }
+    
+    /* Validity Alert */
+    .validity-alert {
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      border: 2px solid #ef4444;
+      border-radius: 10px;
+      text-align: center;
+      margin: 24px 0;
+    }
+    
+    .validity-alert strong {
+      font-size: 13px;
+      color: #991b1b;
+      display: block;
+      margin-bottom: 4px;
+    }
+    
+    .validity-alert span {
+      font-size: 16px;
+      font-weight: 700;
+      color: #dc2626;
+    }
+    
+    /* Garanties */
+    .garanties-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 20px;
+    }
+    
+    .garantie-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+    
+    .garantie-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    
+    .garantie-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+    
+    .garantie-desc {
+      font-size: 9px;
+      color: #64748b;
+    }
+    
+    /* Conditions */
+    .conditions-section {
+      margin-top: 40px;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+    }
+    
+    .conditions-section h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .conditions-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .conditions-list li {
+      padding: 10px 0 10px 28px;
+      font-size: 10px;
+      color: #475569;
+      line-height: 1.6;
+      position: relative;
+    }
+    
+    .conditions-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #10b981;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    
+    /* Nouvelle section Acceptation – propre et professionnelle */
+    .acceptation-section {
+      margin: 60px 0 40px;
+      padding: 30px;
+      background: #f0f9ff;
+      border: 3px solid #3b82f6;
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .acceptation-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 20px;
+    }
+    
+    .acceptation-text {
+      font-size: 12px;
+      color: #475569;
+      margin-bottom: 30px;
+      line-height: 1.7;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .signature-line {
+      border-bottom: 2px solid #1e293b;
+      width: 350px;
+      margin: 30px auto 10px;
+    }
+    
+    .signature-label {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+    }
+    
+    /* Footer */
+    .footer {
+      margin-top: 50px;
+      padding-top: 24px;
+      border-top: 2px solid #e2e8f0;
+      text-align: center;
+    }
+    
+    .footer p {
+      font-size: 9px;
+      color: #64748b;
+      margin: 4px 0;
+    }
+    
+    .footer strong {
+      color: #1e293b;
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-grid">
+      <div class="logo-section" style="text-align: center;">
+        <img src="https://pnvnipgtydhlhgrjwzvu.supabase.co/storage/v1/object/public/assets/logo.png" 
+             alt="Logo ToitureAI" 
+             style="height: 125px; width: auto; max-width: 100%; margin-bottom: 16px; border-radius: 12px;" />
+        <h1>ToitureAI</h1>
+        <p>Expert en Couverture Grand Est</p>
+      </div>
+      <div class="company-info">
+        <p><strong>ToitureAI SAS</strong></p>
+        <p>123 Rue des Couvreurs, 57000 Metz</p>
+        <p>📞 06 44 99 32 31</p>
+        <p>✉️ contact@toitureai.fr</p>
+        <p>SIRET: 123 456 789 00012</p>
+        <p>TVA Intracom.: FR12345678900</p>
+        <p>RGE: 2024-R-057-001</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOCUMENT INFO -->
+  <div class="doc-info">
+    <div class="info-card highlight">
+      <div class="info-label">Numéro de Devis</div>
+      <div class="devis-number">${numeroDevis}</div>
+      <div class="info-label" style="margin-top: 12px;">Date d'émission</div>
+      <div class="info-value">${today}</div>
+    </div>
+    
+    <div class="info-card">
+      <div class="info-label">Type de Projet</div>
+      <div class="info-value">${escapeHtml(type_projet)}</div>
+      <div class="info-label" style="margin-top: 12px;">Validité du Devis</div>
+      <div class="info-value">${validite_jours} jours</div>
+    </div>
+  </div>
+
+  <!-- CLIENT INFO -->
+  <div class="client-section">
+    <h2>👤 Informations Client</h2>
+    <div class="client-grid">
+      <div class="client-item">
+        <span class="client-label">Nom:</span>
+        <span class="client-value"><strong>${escapeHtml(nom)}</strong></span>
+      </div>
+      <div class="client-item">
+        <span class="client-label">Prénom:</span>
+        <span class="client-value"><strong>${escapeHtml(prenom)}</strong></span>
+      </div>
+      <div class="client-item">
+        <span class="client-label">Email:</span>
+        <span class="client-value">${escapeHtml(email)}</span>
+      </div>
+      ${telephone ? `
+      <div class="client-item">
+        <span class="client-label">Téléphone:</span>
+        <span class="client-value">${escapeHtml(telephone)}</span>
+      </div>
+      ` : ''}
+      ${adresse ? `
+      <div class="client-item">
+        <span class="client-label">Adresse:</span>
+        <span class="client-value">${escapeHtml(adresse)}</span>
+      </div>
+      ` : ''}
+      ${ville ? `
+      <div class="client-item">
+        <span class="client-label">Ville:</span>
+        <span class="client-value">${escapeHtml(ville)} ${escapeHtml(code_postal)}</span>
+      </div>
+      ` : ''}
+    </div>
+  </div>
+
+  <!-- ITEMS TABLE -->
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th style="width: 40px; text-align: center;">N°</th>
+        <th>Désignation</th>
+        <th style="width: 100px; text-align: center;">Quantité</th>
+        <th style="width: 120px; text-align: right;">Prix Unit. HT</th>
+        <th style="width: 120px; text-align: right;">Total HT</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows}
+    </tbody>
+  </table>
+
+  <!-- TOTALS -->
+  <div class="totals-section">
+    <div class="totals-box">
+      <div class="totals-row">
+        <span class="totals-label">Total HT</span>
+        <span class="totals-value">${formatEuro(total_ht)}</span>
+      </div>
+      <div class="totals-row">
+        <span class="totals-label">TVA (${tva_pourcent}%)</span>
+        <span class="totals-value">${formatEuro(total_tva)}</span>
+      </div>
+      <div class="totals-row totals-final">
+        <span class="totals-label">Total TTC</span>
+        <span class="totals-value">${formatEuro(total_ttc)}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  ${inputData.notes ? `
+  <div class="notes-section">
+    <h3>📝 Notes Complémentaires</h3>
+    <p>${escapeHtml(inputData.notes)}</p>
+  </div>
+  ` : ''}
+
+  <!-- VALIDITY ALERT -->
+  <div class="validity-alert">
+    <strong>⚠️ Ce devis est valable jusqu'au</strong>
+    <span>${dateValiditeStr}</span>
+  </div>
+
+  <!-- GARANTIES -->
+  <div class="garanties-grid">
+    <div class="garantie-card">
+      <div class="garantie-icon">🛡️</div>
+      <div class="garantie-title">Garantie Décennale</div>
+      <div class="garantie-desc">Assurance Allianz Pro BTP</div>
+    </div>
+    <div class="garantie-card">
+      <div class="garantie-icon">✅</div>
+      <div class="garantie-title">Certifié RGE</div>
+      <div class="garantie-desc">N° 2024-R-057-001</div>
+    </div>
+    <div class="garantie-card">
+      <div class="garantie-icon">📋</div>
+      <div class="garantie-title">Respect des DTU</div>
+      <div class="garantie-desc">Normes professionnelles</div>
+    </div>
+  </div>
+
+  <!-- CONDITIONS -->
+  <div class="conditions-section">
+    <h3>📄 Conditions Générales</h3>
+    <ul class="conditions-list">
+      <li><strong>Modalités de paiement:</strong> 30% à la commande, 40% à mi-chantier, 30% solde à réception des travaux.</li>
+      <li><strong>Délai d'exécution:</strong> Selon planning convenu, sous réserve de disponibilité des matériaux et conditions météorologiques favorables.</li>
+      <li><strong>Garantie décennale:</strong> 10 ans sur les travaux de couverture conformément à la loi Spinetta.</li>
+      <li><strong>Garantie biennale:</strong> 2 ans sur les équipements dissociables (gouttières, etc.).</li>
+      <li><strong>Validité:</strong> Ce devis est valable ${validite_jours} jours à compter de la date d'émission.</li>
+      <li><strong>Conformité:</strong> Travaux réalisés selon les Documents Techniques Unifiés (DTU) en vigueur.</li>
+      <li><strong>Aides de l'État:</strong> Éligibilité aux aides MaPrimeRénov' et Éco-PTZ (sous conditions, certification RGE).</li>
+      <li><strong>Assurances:</strong> Nos travaux sont couverts par notre assurance décennale (Allianz Pro BTP).</li>
+    </ul>
+  </div>
+
+  <!-- SECTION ACCEPTATION DU CLIENT – Propre et professionnelle -->
+  <div class="acceptation-section">
+    <div class="acceptation-title">Acceptation du devis</div>
+    <p class="acceptation-text">
+      Je soussigné(e) accepte les conditions du présent devis et autorise ToitureAI SAS à réaliser les travaux décrits ci-dessus.<br>
+      Le présent devis devient contrat exécutoire dès retour signé (par email, courrier ou remise en mains propres).<br><br>
+      <strong>Mention à reporter de votre main :</strong> "Bon pour accord"
+    </p>
+    <div style="margin-top: 40px;">
+      <div class="signature-label">Signature du client</div>
+      <div class="signature-line"></div>
+      <div class="signature-label" style="margin-top: 8px;">Nom et prénom : ${escapeHtml(prenom + ' ' + nom)}</div>
+      <div class="signature-label">Date : _________________________</div>
+    </div>
+  </div>
+
+  <!-- Signature entreprise – Statique et professionnelle -->
+  <div style="margin: 60px 0 40px; text-align: right; font-size: 11px; color: #475569;">
+    <p><strong>Devis établi et validé électroniquement par :</strong></p>
+    <p>ToitureAI SAS<br>
+    Représentée par HARCHI ABOUFARIS Mohamed<br>
+    Le ${today}</p>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p><strong>ToitureAI SAS</strong> - Capital social: 50 000€ - RCS Metz B 123 456 789</p>
+    <p>Siège social: 123 Rue des Couvreurs, 57000 Metz | 📞 06 44 99 32 31 | ✉️ contact@toitureai.fr</p>
+    <p style="margin-top: 12px; font-size: 8px; color: #94a3b8;">
+      Document généré automatiquement le ${today} - Ne pas jeter sur la voie publique (Loi n°75-633 du 15/07/1975)
+    </p>
+  </div>
+
+</body>
+</html>
+`;
+
+// Retour
+return [{
+  json: {
+    ...inputData,
+    html,
+    filename,
+    numeroDevis,
+    lead_id,
+    client_prenom: prenom,
+    client_nom: nom,
+    client_email: email,
+    client_telephone: telephone
+  }
+}];

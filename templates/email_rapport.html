@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rapport Mensuel - {{ periode }}</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #1e293b;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f8fafc;
+    }
+    .container {
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .header p {
+      margin: 0;
+      opacity: 0.9;
+      font-size: 16px;
+    }
+    .content {
+      padding: 30px;
+    }
+    .greeting {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .message {
+      font-size: 14px;
+      color: #475569;
+      margin-bottom: 24px;
+    }
+    .kpi-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .kpi-card {
+      flex: 1;
+      min-width: 120px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+    .kpi-card.highlight {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border-color: #10b981;
+    }
+    .kpi-label {
+      font-size: 11px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .kpi-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .kpi-card.highlight .kpi-value {
+      color: #059669;
+    }
+    .kpi-subvalue {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+    .ca-box {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      border-radius: 10px;
+      padding: 24px;
+      text-align: center;
+      margin: 24px 0;
+    }
+    .ca-label {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+    .ca-value {
+      font-size: 32px;
+      font-weight: 700;
+    }
+    .ca-subvalue {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-top: 8px;
+    }
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      text-decoration: none;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      margin: 20px 0;
+    }
+    .attachment-notice {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 24px 0;
+    }
+    .attachment-notice h4 {
+      margin: 0 0 8px 0;
+      color: #1e40af;
+      font-size: 14px;
+    }
+    .attachment-notice p {
+      margin: 0;
+      color: #3b82f6;
+      font-size: 13px;
+    }
+    .footer {
+      background: #f1f5f9;
+      padding: 24px 30px;
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+    }
+    .footer p {
+      margin: 4px 0;
+    }
+    .footer a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Rapport Mensuel</h1>
+      <p>{{ periode }}</p>
+    </div>
+
+    <div class="content">
+      <p class="greeting">Bonjour,</p>
+
+      <p class="message">
+        Voici le rapport mensuel ToitureAI pour {{ periode }}.
+        Retrouvez ci-dessous un resume des performances du mois.
+      </p>
+
+      <!-- CA Box -->
+      <div class="ca-box">
+        <div class="ca-label">Chiffre d'Affaires du Mois</div>
+        <div class="ca-value">{{ ca_mensuel }}</div>
+        <div class="ca-subvalue">Panier moyen: {{ panier_moyen }}</div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Leads</div>
+          <div class="kpi-value">{{ nb_leads }}</div>
+        </div>
+        <div class="kpi-card highlight">
+          <div class="kpi-label">Convertis</div>
+          <div class="kpi-value">{{ nb_leads_gagnes }}</div>
+          <div class="kpi-subvalue">{{ taux_conversion }}%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Devis</div>
+          <div class="kpi-value">{{ nb_devis }}</div>
+        </div>
+        <div class="kpi-card highlight">
+          <div class="kpi-label">Signes</div>
+          <div class="kpi-value">{{ nb_devis_signes }}</div>
+        </div>
+      </div>
+
+      <!-- Attachment notice -->
+      <div class="attachment-notice">
+        <h4>Rapport PDF en piece jointe</h4>
+        <p>
+          Le rapport complet avec le detail des leads, devis et le classement
+          des meilleurs clients est disponible en piece jointe de cet email.
+        </p>
+      </div>
+
+      <div style="text-align: center;">
+        <a href="{{ dashboard_url }}" class="cta-button">
+          Acceder au Dashboard
+        </a>
+      </div>
+
+      <p class="message" style="margin-top: 24px;">
+        Bonne lecture !<br>
+        <strong>L'equipe ToitureAI</strong>
+      </p>
+    </div>
+
+    <div class="footer">
+      <p><strong>ToitureAI SAS</strong></p>
+      <p>123 Rue des Couvreurs, 57000 Metz</p>
+      <p style="margin-top: 12px;">
+        <a href="{{ website_url }}">{{ website_url }}</a>
+      </p>
+      <p style="margin-top: 8px; font-size: 11px; color: #94a3b8;">
+        Ce rapport est genere automatiquement chaque mois.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signature Confirmee - ToitureAI</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #1e293b;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f8fafc;
+    }
+    .container {
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .header p {
+      margin: 0;
+      opacity: 0.9;
+      font-size: 14px;
+    }
+    .success-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+    .content {
+      padding: 30px;
+    }
+    .greeting {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .message {
+      font-size: 14px;
+      color: #475569;
+      margin-bottom: 24px;
+    }
+    .confirmation-box {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 2px solid #10b981;
+      border-radius: 10px;
+      padding: 24px;
+      margin: 24px 0;
+      text-align: center;
+    }
+    .confirmation-box h3 {
+      margin: 0 0 12px 0;
+      color: #047857;
+      font-size: 18px;
+    }
+    .devis-number {
+      font-size: 24px;
+      font-weight: 700;
+      color: #059669;
+    }
+    .confirmation-date {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+    .next-steps {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 24px 0;
+    }
+    .next-steps h4 {
+      margin: 0 0 16px 0;
+      color: #1e293b;
+      font-size: 16px;
+    }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .step-number {
+      background: #10b981;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    .step-text {
+      font-size: 14px;
+      color: #475569;
+    }
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: white;
+      text-decoration: none;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      margin: 20px 0;
+    }
+    .contact {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 24px 0;
+    }
+    .contact h4 {
+      margin: 0 0 12px 0;
+      color: #1e293b;
+      font-size: 14px;
+    }
+    .contact p {
+      margin: 4px 0;
+      color: #64748b;
+      font-size: 13px;
+    }
+    .footer {
+      background: #f1f5f9;
+      padding: 24px 30px;
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+    }
+    .footer p {
+      margin: 4px 0;
+    }
+    .footer a {
+      color: #10b981;
+      text-decoration: none;
+    }
+    .legal-notice {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="success-icon">OK</div>
+      <h1>Signature Confirmee</h1>
+      <p>Votre devis a ete signe avec succes</p>
+    </div>
+
+    <div class="content">
+      <p class="greeting">Bonjour {{ client_name }},</p>
+
+      <p class="message">
+        Nous avons bien recu votre signature electronique. Votre devis est maintenant
+        officiellement accepte et nous pouvons proceder aux prochaines etapes.
+      </p>
+
+      <div class="confirmation-box">
+        <h3>Devis Signe</h3>
+        <div class="devis-number">{{ numero_devis }}</div>
+        <p class="confirmation-date">
+          Signe le {{ now().strftime('%d/%m/%Y a %H:%M') if now is defined else 'aujourd\'hui' }}
+        </p>
+      </div>
+
+      <div style="text-align: center;">
+        <a href="{{ pdf_url }}" class="cta-button">
+          Telecharger le devis signe
+        </a>
+      </div>
+
+      <div class="next-steps">
+        <h4>Prochaines etapes :</h4>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span class="step-text">
+            <strong>Confirmation</strong> - Notre equipe va verifier votre dossier
+            et vous contactera sous 24-48h.
+          </span>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span class="step-text">
+            <strong>Planification</strong> - Nous conviendrons ensemble d'une date
+            pour demarrer les travaux.
+          </span>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span class="step-text">
+            <strong>Acompte</strong> - Un acompte de 30% vous sera demande
+            pour confirmer la commande.
+          </span>
+        </div>
+      </div>
+
+      <p class="message">
+        Conservez precieusement ce document signe. Il fait office de contrat
+        entre vous et ToitureAI SAS.
+      </p>
+
+      <div class="contact">
+        <h4>Une question ?</h4>
+        <p>Tel: 06 44 99 32 31</p>
+        <p>Email: contact@toitureai.fr</p>
+        <p>Du lundi au vendredi, 8h-18h</p>
+      </div>
+
+      <p class="message">
+        Merci pour votre confiance !<br>
+        <strong>L'equipe ToitureAI</strong>
+      </p>
+    </div>
+
+    <div class="footer">
+      <p><strong>ToitureAI SAS</strong></p>
+      <p>123 Rue des Couvreurs, 57000 Metz</p>
+      <p>SIRET: 123 456 789 00012 | Certifie RGE</p>
+      <p style="margin-top: 12px;">
+        <a href="{{ website_url }}">{{ website_url }}</a>
+      </p>
+
+      <div class="legal-notice">
+        <p>
+          Ce document a ete signe electroniquement via DocuSeal.
+          La signature electronique a la meme valeur juridique qu'une signature manuscrite
+          conformement au reglement eIDAS.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

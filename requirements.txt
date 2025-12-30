@@ -1,0 +1,34 @@
+# ToitureAI - Python Migration
+
+# FastAPI & Web
+fastapi
+uvicorn[standard]
+python-multipart
+httpx
+
+# Pydantic v2
+pydantic
+pydantic-settings
+
+# Supabase
+supabase
+
+# OpenAI
+openai
+
+# SendGrid
+sendgrid
+
+# PDF Generation
+xhtml2pdf
+
+# Scheduling
+apscheduler
+
+# Utilities
+python-dotenv
+jinja2
+email-validator
+
+# Logging
+structlog

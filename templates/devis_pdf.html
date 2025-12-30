@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Devis {{ numero_devis }}</title>
+  <style>
+    @page {
+      margin: 1cm;
+      size: A4;
+    }
+
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      background: #ffffff;
+      line-height: 1.5;
+      font-size: 10pt;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Header */
+    .header {
+      background-color: #1e3a8a;
+      color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .header-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .header-table td {
+      vertical-align: middle;
+    }
+
+    .logo-cell {
+      width: 50%;
+      text-align: center;
+    }
+
+    .logo-cell h1 {
+      font-size: 22px;
+      font-weight: bold;
+      margin: 8px 0 4px 0;
+    }
+
+    .logo-cell p {
+      font-size: 11px;
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    .company-cell {
+      width: 50%;
+      text-align: right;
+      font-size: 9px;
+      line-height: 1.6;
+    }
+
+    .company-cell p {
+      margin: 1px 0;
+    }
+
+    /* Document Info */
+    .doc-info-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 10px 0;
+      margin-bottom: 15px;
+    }
+
+    .info-card {
+      background-color: #f8fafc;
+      border: 2px solid #e2e8f0;
+      padding: 15px;
+      vertical-align: top;
+    }
+
+    .info-card-highlight {
+      background-color: #eff6ff;
+      border: 2px solid #3b82f6;
+      padding: 15px;
+      vertical-align: top;
+    }
+
+    .info-label {
+      font-size: 9px;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .info-value {
+      font-size: 12px;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 10px;
+    }
+
+    .devis-number {
+      font-size: 16px;
+      font-weight: bold;
+      color: #3b82f6;
+    }
+
+    /* Client Section */
+    .client-section {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .client-section h2 {
+      font-size: 13px;
+      font-weight: bold;
+      color: #1e293b;
+      margin: 0 0 10px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .client-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .client-table td {
+      padding: 4px 8px 4px 0;
+      font-size: 10px;
+    }
+
+    .client-label {
+      color: #64748b;
+      font-weight: bold;
+      width: 80px;
+    }
+
+    .client-value {
+      color: #1e293b;
+    }
+
+    /* Items Table */
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+
+    .items-table thead th {
+      background-color: #1e3a8a;
+      color: white;
+      padding: 10px 8px;
+      text-align: left;
+      font-size: 9px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .items-table tbody td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 10px;
+    }
+
+    .items-table tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    /* Totals */
+    .totals-container {
+      text-align: right;
+      margin: 20px 0;
+    }
+
+    .totals-table {
+      margin-left: auto;
+      border-collapse: collapse;
+      width: 280px;
+      border: 2px solid #e2e8f0;
+    }
+
+    .totals-table td {
+      padding: 10px 15px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 11px;
+    }
+
+    .totals-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .totals-label {
+      color: #64748b;
+      font-weight: 500;
+      text-align: left;
+    }
+
+    .totals-value {
+      font-weight: bold;
+      color: #1e293b;
+      text-align: right;
+    }
+
+    .totals-final {
+      background-color: #1e3a8a;
+    }
+
+    .totals-final td {
+      color: white;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    /* Notes */
+    .notes-section {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #fef3c7;
+      border-left: 4px solid #f59e0b;
+    }
+
+    .notes-section h3 {
+      font-size: 11px;
+      font-weight: bold;
+      color: #92400e;
+      margin: 0 0 5px 0;
+    }
+
+    .notes-section p {
+      font-size: 10px;
+      color: #78350f;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* Validity Alert */
+    .validity-alert {
+      padding: 12px;
+      background-color: #fee2e2;
+      border: 2px solid #ef4444;
+      text-align: center;
+      margin: 15px 0;
+    }
+
+    .validity-alert strong {
+      font-size: 10px;
+      color: #991b1b;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .validity-alert span {
+      font-size: 13px;
+      font-weight: bold;
+      color: #dc2626;
+    }
+
+    /* Garanties */
+    .garanties-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 8px 0;
+      margin: 15px 0;
+    }
+
+    .garantie-card {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 12px;
+      text-align: center;
+      vertical-align: top;
+    }
+
+    .garantie-icon {
+      font-size: 10px;
+      font-weight: bold;
+      color: #3b82f6;
+      margin-bottom: 5px;
+    }
+
+    .garantie-title {
+      font-size: 9px;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 2px;
+    }
+
+    .garantie-desc {
+      font-size: 8px;
+      color: #64748b;
+    }
+
+    /* Conditions */
+    .conditions-section {
+      margin-top: 25px;
+      padding: 15px;
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+
+    .conditions-section h3 {
+      font-size: 11px;
+      font-weight: bold;
+      color: #1e293b;
+      margin: 0 0 10px 0;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .conditions-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .conditions-list li {
+      padding: 6px 0 6px 20px;
+      font-size: 8px;
+      color: #475569;
+      line-height: 1.4;
+      position: relative;
+    }
+
+    .conditions-list li:before {
+      content: "OK";
+      position: absolute;
+      left: 0;
+      color: #10b981;
+      font-weight: bold;
+      font-size: 7px;
+    }
+
+    /* Acceptation */
+    .acceptation-section {
+      margin: 30px 0 20px;
+      padding: 20px;
+      background-color: #eff6ff;
+      border: 3px solid #3b82f6;
+      text-align: center;
+    }
+
+    .acceptation-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #1e3a8a;
+      margin-bottom: 15px;
+    }
+
+    .acceptation-text {
+      font-size: 10px;
+      color: #475569;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .signature-zone {
+      margin-top: 25px;
+    }
+
+    .signature-line {
+      border-bottom: 2px solid #1e293b;
+      width: 250px;
+      margin: 20px auto 8px auto;
+    }
+
+    .signature-label {
+      font-size: 9px;
+      color: #64748b;
+      font-weight: bold;
+    }
+
+    /* Signature entreprise */
+    .signature-entreprise {
+      margin: 30px 0 20px;
+      text-align: right;
+      font-size: 9px;
+      color: #475569;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 30px;
+      padding-top: 15px;
+      border-top: 2px solid #e2e8f0;
+      text-align: center;
+    }
+
+    .footer p {
+      font-size: 8px;
+      color: #64748b;
+      margin: 2px 0;
+    }
+
+    .footer strong {
+      color: #1e293b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <table class="header-table">
+      <tr>
+        <td class="logo-cell">
+          {% if entreprise.logo_url %}
+          <img src="{{ entreprise.logo_url }}" alt="Logo" style="height: 80px; width: auto; margin-bottom: 8px;" />
+          {% endif %}
+          <h1>{{ entreprise.nom }}</h1>
+          <p>Expert en Couverture Grand Est</p>
+        </td>
+        <td class="company-cell">
+          <p><strong>{{ entreprise.nom }}</strong></p>
+          <p>{{ entreprise.adresse }}</p>
+          <p>Tel: {{ entreprise.telephone }}</p>
+          <p>Email: {{ entreprise.email }}</p>
+          <p>SIRET: {{ entreprise.siret }}</p>
+          <p>TVA: {{ entreprise.tva_intracom }}</p>
+          <p>RGE: {{ entreprise.rge }}</p>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- DOCUMENT INFO -->
+  <table class="doc-info-table">
+    <tr>
+      <td class="info-card-highlight" style="width: 48%;">
+        <div class="info-label">NUMERO DE DEVIS</div>
+        <div class="devis-number">{{ numero_devis }}</div>
+        <div class="info-label" style="margin-top: 10px;">DATE D'EMISSION</div>
+        <div class="info-value">{{ today }}</div>
+      </td>
+      <td class="info-card" style="width: 48%;">
+        <div class="info-label">TYPE DE PROJET</div>
+        <div class="info-value">{{ type_projet }}</div>
+        <div class="info-label" style="margin-top: 10px;">VALIDITE</div>
+        <div class="info-value">{{ validite_jours }} jours</div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- CLIENT INFO -->
+  <div class="client-section">
+    <h2>INFORMATIONS CLIENT</h2>
+    <table class="client-table">
+      <tr>
+        <td class="client-label">Nom:</td>
+        <td class="client-value"><strong>{{ client.nom }}</strong></td>
+        <td class="client-label">Prenom:</td>
+        <td class="client-value"><strong>{{ client.prenom }}</strong></td>
+      </tr>
+      <tr>
+        <td class="client-label">Email:</td>
+        <td class="client-value">{{ client.email }}</td>
+        <td class="client-label">Telephone:</td>
+        <td class="client-value">{{ client.telephone }}</td>
+      </tr>
+      {% if client.adresse %}
+      <tr>
+        <td class="client-label">Adresse:</td>
+        <td class="client-value" colspan="3">{{ client.adresse }}{% if client.code_postal %}, {{ client.code_postal }}{% endif %}{% if client.ville %}, {{ client.ville }}{% endif %}</td>
+      </tr>
+      {% endif %}
+    </table>
+  </div>
+
+  <!-- ITEMS TABLE -->
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th style="width: 30px;" class="text-center">N</th>
+        <th>DESIGNATION</th>
+        <th style="width: 80px;" class="text-center">QTE</th>
+        <th style="width: 90px;" class="text-right">P.U. HT</th>
+        <th style="width: 90px;" class="text-right">TOTAL HT</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ligne in lignes %}
+      <tr>
+        <td class="text-center" style="color: #64748b;">{{ ligne.index }}</td>
+        <td><strong>{{ ligne.designation }}</strong></td>
+        <td class="text-center">{{ ligne.quantite }} {{ ligne.unite }}</td>
+        <td class="text-right">{{ ligne.prix_unitaire_ht|format_euro }}</td>
+        <td class="text-right" style="font-weight: bold;">{{ ligne.total_ht|format_euro }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- TOTALS -->
+  <div class="totals-container">
+    <table class="totals-table">
+      <tr>
+        <td class="totals-label">Total HT</td>
+        <td class="totals-value">{{ total_ht|format_euro }}</td>
+      </tr>
+      <tr>
+        <td class="totals-label">TVA ({{ tva_pourcent }}%)</td>
+        <td class="totals-value">{{ total_tva|format_euro }}</td>
+      </tr>
+      <tr class="totals-final">
+        <td>Total TTC</td>
+        <td class="text-right">{{ total_ttc|format_euro }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- NOTES -->
+  {% if notes %}
+  <div class="notes-section">
+    <h3>NOTES</h3>
+    <p>{{ notes }}</p>
+  </div>
+  {% endif %}
+
+  <!-- VALIDITY ALERT -->
+  <div class="validity-alert">
+    <strong>CE DEVIS EST VALABLE JUSQU'AU</strong>
+    <span>{{ date_validite }}</span>
+  </div>
+
+  <!-- GARANTIES -->
+  <table class="garanties-table">
+    <tr>
+      <td class="garantie-card">
+        <div class="garantie-icon">[GARANTIE]</div>
+        <div class="garantie-title">Garantie Decennale</div>
+        <div class="garantie-desc">Assurance Allianz Pro BTP</div>
+      </td>
+      <td class="garantie-card">
+        <div class="garantie-icon">[RGE]</div>
+        <div class="garantie-title">Certifie RGE</div>
+        <div class="garantie-desc">N {{ entreprise.rge }}</div>
+      </td>
+      <td class="garantie-card">
+        <div class="garantie-icon">[DTU]</div>
+        <div class="garantie-title">Respect des DTU</div>
+        <div class="garantie-desc">Normes professionnelles</div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- CONDITIONS -->
+  <div class="conditions-section">
+    <h3>CONDITIONS GENERALES</h3>
+    <ul class="conditions-list">
+      <li><strong>Modalites de paiement:</strong> 30% a la commande, 40% a mi-chantier, 30% solde a reception.</li>
+      <li><strong>Delai d'execution:</strong> Selon planning convenu, sous reserve des conditions meteorologiques.</li>
+      <li><strong>Garantie decennale:</strong> 10 ans conformement a la loi Spinetta.</li>
+      <li><strong>Garantie biennale:</strong> 2 ans sur les equipements dissociables.</li>
+      <li><strong>Validite:</strong> Ce devis est valable {{ validite_jours }} jours.</li>
+      <li><strong>Conformite:</strong> Travaux realises selon les DTU en vigueur.</li>
+      <li><strong>Aides:</strong> Eligibilite MaPrimeRenov' et Eco-PTZ (certification RGE).</li>
+      <li><strong>Assurances:</strong> Travaux couverts par notre assurance decennale.</li>
+    </ul>
+  </div>
+
+  <!-- ACCEPTATION -->
+  <div class="acceptation-section">
+    <div class="acceptation-title">ACCEPTATION DU DEVIS</div>
+    <p class="acceptation-text">
+      Je soussigne(e) accepte les conditions du present devis et autorise {{ entreprise.nom }}
+      a realiser les travaux decrits ci-dessus.<br><br>
+      <strong>Mention manuscrite:</strong> "Bon pour accord"
+    </p>
+    <div class="signature-zone">
+      <div class="signature-label">Signature du client</div>
+      <div class="signature-line"></div>
+      <div class="signature-label">{{ client.nom_complet }}</div>
+      <div class="signature-label">Date: _____________________</div>
+    </div>
+  </div>
+
+  <!-- Signature entreprise -->
+  <div class="signature-entreprise">
+    <p><strong>Devis etabli par:</strong></p>
+    <p>{{ entreprise.nom }}<br>
+    {{ entreprise.representant }}<br>
+    Le {{ today }}</p>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p><strong>{{ entreprise.nom }}</strong> - Capital: {{ entreprise.capital }} - RCS Metz</p>
+    <p>{{ entreprise.adresse }} | {{ entreprise.telephone }} | {{ entreprise.email }}</p>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erreur ToitureAI - {{ workflow }}</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+    }
+    .header h1 {
+      margin: 0 0 10px;
+      font-size: 24px;
+    }
+    .header p {
+      margin: 0;
+      opacity: 0.9;
+    }
+    .content {
+      padding: 30px;
+    }
+    .error-box {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      border-left: 4px solid #e74c3c;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .error-box h3 {
+      color: #e74c3c;
+      margin: 0 0 15px;
+    }
+    .error-message {
+      background: #2d3748;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      word-break: break-all;
+    }
+    .info-grid {
+      display: table;
+      width: 100%;
+      margin: 20px 0;
+    }
+    .info-row {
+      display: table-row;
+    }
+    .info-label {
+      display: table-cell;
+      padding: 8px 15px 8px 0;
+      font-weight: bold;
+      color: #4a5568;
+      width: 120px;
+    }
+    .info-value {
+      display: table-cell;
+      padding: 8px 0;
+      color: #2d3748;
+    }
+    .details-box {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .details-box h4 {
+      color: #4a5568;
+      margin: 0 0 15px;
+    }
+    .details-content {
+      background: #1a202c;
+      color: #a0aec0;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 12px;
+      overflow-x: auto;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background: #f9fafc;
+      font-size: 12px;
+      color: #7f8c8d;
+      border-top: 1px solid #eaeaea;
+    }
+    .timestamp {
+      background: #edf2f7;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #4a5568;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>⚠️ Erreur Système</h1>
+      <p>Une erreur s'est produite dans ToitureAI</p>
+    </div>
+
+    <div class="content">
+      <div class="error-box">
+        <h3>❌ Message d'erreur</h3>
+        <div class="error-message">
+          {{ error_message }}
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-row">
+          <span class="info-label">Workflow :</span>
+          <span class="info-value">{{ workflow }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Noeud :</span>
+          <span class="info-value">{{ node }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Timestamp :</span>
+          <span class="info-value">
+            <span class="timestamp">{{ details.timestamp if details and details.timestamp else 'N/A' }}</span>
+          </span>
+        </div>
+      </div>
+
+      {% if details %}
+      <div class="details-box">
+        <h4>📋 Détails techniques</h4>
+        <div class="details-content">
+          {% if details.type %}
+          <p><strong>Type:</strong> {{ details.type }}</p>
+          {% endif %}
+          {% if details.traceback %}
+          <pre>{{ details.traceback }}</pre>
+          {% else %}
+          <pre>{{ details | tojson(indent=2) if details else 'Aucun détail disponible' }}</pre>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="footer">
+      <p>ToitureAI - Alerte automatique d'erreur</p>
+      <p style="font-size: 11px; color: #999;">
+        Veuillez vérifier les logs du serveur pour plus de détails.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

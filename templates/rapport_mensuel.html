@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rapport Mensuel - {{ periode.titre }}</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 1.5cm;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.5;
+      color: #1e293b;
+      font-size: 10pt;
+      margin: 0;
+      padding: 0;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24pt;
+      font-weight: 700;
+    }
+
+    .header .subtitle {
+      margin: 8px 0 0 0;
+      opacity: 0.9;
+      font-size: 12pt;
+    }
+
+    .header .logo {
+      font-size: 28pt;
+      font-weight: 800;
+    }
+
+    .meta-info {
+      background: #f1f5f9;
+      padding: 12px 20px;
+      border-radius: 6px;
+      margin-bottom: 24px;
+      font-size: 9pt;
+      color: #64748b;
+    }
+
+    .meta-info span {
+      margin-right: 24px;
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin: 0 0 16px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    /* KPIs Grid */
+    .kpi-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      min-width: 140px;
+      flex: 1;
+    }
+
+    .kpi-card.highlight {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border-color: #10b981;
+    }
+
+    .kpi-card.warning {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border-color: #f59e0b;
+    }
+
+    .kpi-label {
+      font-size: 9pt;
+      color: #64748b;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .kpi-value {
+      font-size: 20pt;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .kpi-card.highlight .kpi-value {
+      color: #059669;
+    }
+
+    .kpi-subvalue {
+      font-size: 9pt;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* Financial KPIs */
+    .financial-grid {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .financial-card {
+      flex: 1;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .financial-card.secondary {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    }
+
+    .financial-label {
+      font-size: 10pt;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+
+    .financial-value {
+      font-size: 18pt;
+      font-weight: 700;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #475569;
+      font-weight: 600;
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    /* Status badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 8pt;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: #d1fae5;
+      color: #059669;
+    }
+
+    .badge-warning {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .badge-info {
+      background: #dbeafe;
+      color: #2563eb;
+    }
+
+    /* Top clients */
+    .rank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background: #3b82f6;
+      color: white;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 10pt;
+    }
+
+    .rank.gold {
+      background: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
+    }
+
+    .rank.silver {
+      background: linear-gradient(135deg, #9ca3af 0%, #d1d5db 100%);
+      color: #374151;
+    }
+
+    .rank.bronze {
+      background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 8pt;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    /* Charts placeholder */
+    .chart-placeholder {
+      background: #f8fafc;
+      border: 2px dashed #e2e8f0;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      color: #94a3b8;
+      margin-bottom: 16px;
+    }
+
+    /* Summary box */
+    .summary-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .summary-box h4 {
+      margin: 0 0 12px 0;
+      color: #1e40af;
+      font-size: 11pt;
+    }
+
+    .summary-box p {
+      margin: 0;
+      color: #3b82f6;
+      font-size: 10pt;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div>
+        <h1>Rapport Mensuel</h1>
+        <p class="subtitle">{{ periode.titre }}</p>
+      </div>
+      <div class="logo">ToitureAI</div>
+    </div>
+  </div>
+
+  <!-- Meta info -->
+  <div class="meta-info">
+    <span><strong>Periode:</strong> {{ periode.periode_formatted }}</span>
+    <span><strong>Genere le:</strong> {{ genere_le }}</span>
+  </div>
+
+  <!-- Resume executif -->
+  <div class="summary-box">
+    <h4>Resume du mois</h4>
+    <p>
+      {{ lead_kpis.total }} leads recus ce mois,
+      {{ lead_kpis.gagnes }} convertis ({{ lead_kpis.taux_conversion }}% de conversion).
+      {{ devis_kpis.signes }} devis signes pour un CA de {{ financial_kpis.ca_mensuel_formatted }}.
+    </p>
+  </div>
+
+  <!-- KPIs Financiers -->
+  <div class="section">
+    <h2 class="section-title">Indicateurs Financiers</h2>
+    <div class="financial-grid">
+      <div class="financial-card">
+        <div class="financial-label">Chiffre d'Affaires Mensuel</div>
+        <div class="financial-value">{{ financial_kpis.ca_mensuel_formatted }}</div>
+      </div>
+      <div class="financial-card secondary">
+        <div class="financial-label">CA Encaisse</div>
+        <div class="financial-value">{{ financial_kpis.ca_encaisse_formatted }}</div>
+      </div>
+      <div class="financial-card">
+        <div class="financial-label">Panier Moyen</div>
+        <div class="financial-value">{{ financial_kpis.panier_moyen_formatted }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs Leads -->
+  <div class="section">
+    <h2 class="section-title">Performance Leads</h2>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Leads</div>
+        <div class="kpi-value">{{ lead_kpis.total }}</div>
+      </div>
+      <div class="kpi-card highlight">
+        <div class="kpi-label">Leads Gagnes</div>
+        <div class="kpi-value">{{ lead_kpis.gagnes }}</div>
+        <div class="kpi-subvalue">{{ lead_kpis.taux_conversion }}% de conversion</div>
+      </div>
+      <div class="kpi-card warning">
+        <div class="kpi-label">Leads Perdus</div>
+        <div class="kpi-value">{{ lead_kpis.perdus }}</div>
+        <div class="kpi-subvalue">{{ lead_kpis.taux_perte }}% de perte</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">En Cours</div>
+        <div class="kpi-value">{{ lead_kpis.en_cours }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs Devis -->
+  <div class="section">
+    <h2 class="section-title">Performance Devis</h2>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Devis</div>
+        <div class="kpi-value">{{ devis_kpis.total }}</div>
+      </div>
+      <div class="kpi-card highlight">
+        <div class="kpi-label">Devis Signes</div>
+        <div class="kpi-value">{{ devis_kpis.signes }}</div>
+        <div class="kpi-subvalue">{{ devis_kpis.taux_signature }}% de signature</div>
+      </div>
+      <div class="kpi-card highlight">
+        <div class="kpi-label">Devis Payes</div>
+        <div class="kpi-value">{{ devis_kpis.payes }}</div>
+        <div class="kpi-subvalue">{{ devis_kpis.taux_paiement }}% paiement</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">En Attente</div>
+        <div class="kpi-value">{{ devis_kpis.en_attente }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top 10 Clients -->
+  {% if top_clients %}
+  <div class="section">
+    <h2 class="section-title">Top 10 Clients du Mois</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 50px;">Rang</th>
+          <th>Client</th>
+          <th>Ville</th>
+          <th class="text-center">Nb Devis</th>
+          <th class="text-right">Montant Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for client in top_clients %}
+        <tr>
+          <td class="text-center">
+            <span class="rank {% if client.rang == 1 %}gold{% elif client.rang == 2 %}silver{% elif client.rang == 3 %}bronze{% endif %}">
+              {{ client.rang }}
+            </span>
+          </td>
+          <td>
+            <strong>{{ client.nom }}</strong><br>
+            <span style="color: #64748b; font-size: 8pt;">{{ client.email }}</span>
+          </td>
+          <td>{{ client.ville or '-' }}</td>
+          <td class="text-center">{{ client.nb_devis }}</td>
+          <td class="text-right"><strong>{{ client.montant_formatted }}</strong></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Page break before detailed lists -->
+  <div class="page-break"></div>
+
+  <!-- Liste des Leads -->
+  {% if leads %}
+  <div class="section">
+    <h2 class="section-title">Leads du Mois ({{ leads|length }})</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Client</th>
+          <th>Contact</th>
+          <th>Type Travaux</th>
+          <th class="text-center">Score</th>
+          <th class="text-center">Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in leads %}
+        <tr>
+          <td>{{ lead.date_formatted }}</td>
+          <td>
+            <strong>{{ lead.nom }}</strong>
+            {% if lead.ville %}<br><span style="color: #64748b; font-size: 8pt;">{{ lead.ville }}</span>{% endif %}
+          </td>
+          <td>
+            {{ lead.email }}<br>
+            <span style="color: #64748b; font-size: 8pt;">{{ lead.telephone or '-' }}</span>
+          </td>
+          <td>{{ lead.type_travaux or '-' }}</td>
+          <td class="text-center">
+            {% if lead.score %}
+              <strong>{{ lead.score }}</strong>/100
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td class="text-center">
+            {% if lead.statut == 'gagne' %}
+              <span class="badge badge-success">Gagne</span>
+            {% elif lead.statut == 'perdu' %}
+              <span class="badge badge-danger">Perdu</span>
+            {% elif lead.statut == 'qualifie' %}
+              <span class="badge badge-info">Qualifie</span>
+            {% else %}
+              <span class="badge badge-warning">{{ lead.statut|capitalize }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Liste des Devis -->
+  {% if devis %}
+  <div class="section">
+    <h2 class="section-title">Devis du Mois ({{ devis|length }})</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Numero</th>
+          <th>Client</th>
+          <th class="text-right">Montant TTC</th>
+          <th class="text-center">Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in devis %}
+        <tr>
+          <td>{{ d.date_formatted }}</td>
+          <td><strong>{{ d.numero }}</strong></td>
+          <td>
+            {{ d.client_nom }}<br>
+            <span style="color: #64748b; font-size: 8pt;">{{ d.client_email }}</span>
+          </td>
+          <td class="text-right"><strong>{{ d.montant_formatted }}</strong></td>
+          <td class="text-center">
+            {% if d.statut == 'signe' %}
+              <span class="badge badge-success">Signe</span>
+            {% elif d.statut == 'paye' %}
+              <span class="badge badge-success">Paye</span>
+            {% elif d.statut == 'refuse' %}
+              <span class="badge badge-danger">Refuse</span>
+            {% elif d.statut == 'envoye' %}
+              <span class="badge badge-info">Envoye</span>
+            {% else %}
+              <span class="badge badge-warning">{{ d.statut|capitalize }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>
+      <strong>ToitureAI SAS</strong> - Rapport genere automatiquement<br>
+      123 Rue des Couvreurs, 57000 Metz | SIRET: 123 456 789 00012<br>
+      Ce document est confidentiel et destine uniquement a l'usage interne.
+    </p>
+  </div>
+</body>
+</html>

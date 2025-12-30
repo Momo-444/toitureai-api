@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmation de votre demande - ToitureAI</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #1e90ff, #0078d4);
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .header h1 {
+      margin: 0 0 10px;
+      font-size: 26px;
+    }
+    .header p {
+      margin: 0;
+      opacity: 0.9;
+    }
+    .content {
+      padding: 30px;
+    }
+    .section {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-left: 4px solid #27ae60;
+    }
+    .section h3 {
+      color: #27ae60;
+      margin-top: 0;
+      font-size: 16px;
+    }
+    .section p {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    .section strong {
+      color: #2c3e50;
+    }
+    .highlight {
+      background: #eafaf1;
+      border-left: 5px solid #27ae60;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 25px 0;
+    }
+    .highlight h3 {
+      margin: 0 0 10px;
+      color: #27ae60;
+    }
+    .highlight p {
+      margin: 0;
+    }
+    .button {
+      display: inline-block;
+      background: #1e90ff;
+      color: white !important;
+      padding: 15px 35px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .button:hover {
+      background: #0078d4;
+    }
+    .button-container {
+      text-align: center;
+      margin: 30px 0;
+    }
+    .footer {
+      text-align: center;
+      padding: 25px;
+      background: #f9fafc;
+      font-size: 13px;
+      color: #7f8c8d;
+      border-top: 1px solid #eaeaea;
+    }
+    .footer a {
+      color: #1e90ff;
+      text-decoration: none;
+    }
+    .tracking {
+      display: none !important;
+      width: 1px !important;
+      height: 1px !important;
+      border: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Merci {{ lead.prenom }} {{ lead.nom }} ! 👋</h1>
+      <p>Nous avons bien reçu votre demande de devis</p>
+    </div>
+
+    <div class="content">
+      <div class="section">
+        <h3>📋 Récapitulatif de votre demande</h3>
+        <p><strong>Prénom :</strong> {{ lead.prenom or 'Non spécifié' }}</p>
+        <p><strong>Nom :</strong> {{ lead.nom }}</p>
+        <p><strong>Email :</strong> {{ lead.email }}</p>
+        <p><strong>Téléphone :</strong> {{ lead.telephone }}</p>
+        <p><strong>Type de projet :</strong> {{ lead.type_projet }}</p>
+        {% if lead.surface %}
+        <p><strong>Surface :</strong> {{ lead.surface }} m²</p>
+        {% endif %}
+        <p><strong>Adresse :</strong> {{ lead.adresse }}{% if lead.code_postal %}, {{ lead.code_postal }}{% endif %}{% if lead.ville %} {{ lead.ville }}{% endif %}</p>
+        {% if lead.budget_estime %}
+        <p><strong>Budget estimé :</strong> {{ lead.budget_estime }} €</p>
+        {% endif %}
+        <p><strong>Délai souhaité :</strong> {{ lead.delai or 'Flexible' }}</p>
+      </div>
+
+      <div class="highlight">
+        <h3>⏱️ Prochaines étapes</h3>
+        <p>Notre équipe vous contactera sous <strong>24-48 heures</strong> pour affiner votre projet et planifier une visite technique gratuite.</p>
+      </div>
+
+      <div class="button-container">
+        <a href="{{ click_url }}" class="button">✅ Confirmer mon intérêt</a>
+      </div>
+
+      <p style="text-align: center; color: #7f8c8d; font-size: 13px;">
+        En cliquant sur ce bouton, vous confirmez votre intérêt et accélérez le traitement de votre demande.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>Cordialement,<br><strong>L'équipe ToitureAI</strong></p>
+      <p><a href="{{ website_url }}">{{ website_url }}</a></p>
+      <p style="margin-top: 15px; font-size: 11px; color: #999;">
+        Cet email a été envoyé suite à votre demande de devis sur notre site.
+      </p>
+    </div>
+
+    <!-- Pixel de tracking d'ouverture -->
+    <img src="{{ open_url }}"
+         alt=""
+         width="1"
+         height="1"
+         class="tracking">
+  </div>
+</body>
+</html>

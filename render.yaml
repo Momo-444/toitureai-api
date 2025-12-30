@@ -1,0 +1,75 @@
+# ===========================================
+# ToitureAI - Render Blueprint
+# Deploy: https://render.com/deploy
+# ===========================================
+
+services:
+  - type: web
+    name: toitureai-api
+    runtime: docker
+    region: frankfurt  # EU region for GDPR compliance
+    plan: starter  # $7/month - upgrade as needed
+
+    # Docker configuration
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+
+    # Health check
+    healthCheckPath: /health
+
+    # Environment variables (set in Render dashboard)
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: false
+      - key: API_HOST
+        value: 0.0.0.0
+      - key: API_PORT
+        value: 8000
+
+      # Secrets - Configure in Render Dashboard
+      - key: WEBHOOK_SECRET
+        sync: false
+      - key: TRACKING_SECRET
+        sync: false
+      - key: CRON_SECRET
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: SENDGRID_FROM_EMAIL
+        sync: false
+      - key: SENDGRID_FROM_NAME
+        value: ToitureAI
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: DOCUSEAL_API_KEY
+        sync: false
+      - key: TURNSTILE_SECRET_KEY
+        sync: false
+      - key: TURNSTILE_SITE_KEY
+        sync: false
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: API_BASE_URL
+        sync: false
+      - key: WEBSITE_URL
+        sync: false
+      - key: DASHBOARD_URL
+        sync: false
+      - key: HOT_LEAD_THRESHOLD
+        value: "70"
+      - key: MONTHLY_REPORT_HOUR
+        value: "8"
+      - key: MONTHLY_REPORT_DAY
+        value: "1"

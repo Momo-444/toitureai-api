@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if is_hot %}Lead Urgent{% else %}Nouveau Lead{% endif %} - ToitureAI</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .header {
+      {% if is_hot %}
+      background: linear-gradient(135deg, #ff4500, #d43c00);
+      {% else %}
+      background: linear-gradient(135deg, #1e90ff, #0078d4);
+      {% endif %}
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+    }
+    .header h1 {
+      margin: 0 0 10px;
+      font-size: 24px;
+    }
+    .header p {
+      margin: 0;
+      opacity: 0.9;
+    }
+    .content {
+      padding: 30px;
+    }
+    .section {
+      {% if is_hot %}
+      background: #fff5f5;
+      border-left: 4px solid #e74c3c;
+      {% else %}
+      background: #f8f9fa;
+      border-left: 4px solid #27ae60;
+      {% endif %}
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .section h3 {
+      {% if is_hot %}
+      color: #e74c3c;
+      {% else %}
+      color: #27ae60;
+      {% endif %}
+      margin-top: 0;
+      font-size: 16px;
+    }
+    .section p {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    .section strong {
+      color: #2c3e50;
+    }
+    .score {
+      font-size: 20px;
+      font-weight: bold;
+      {% if is_hot %}
+      color: #e74c3c;
+      background: #feecec;
+      {% else %}
+      color: #27ae60;
+      background: #eafaf1;
+      {% endif %}
+      text-align: center;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 15px 0;
+    }
+    .button {
+      display: inline-block;
+      {% if is_hot %}
+      background: #ff4500;
+      {% else %}
+      background: #1e90ff;
+      {% endif %}
+      color: white !important;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      margin: 10px 5px;
+    }
+    .button:hover {
+      opacity: 0.9;
+    }
+    .actions {
+      text-align: center;
+      margin: 25px 0;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background: #f9fafc;
+      font-size: 12px;
+      color: #7f8c8d;
+      border-top: 1px solid #eaeaea;
+    }
+    .priority-badge {
+      display: inline-block;
+      {% if is_hot %}
+      background: #e74c3c;
+      {% else %}
+      background: #3498db;
+      {% endif %}
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      {% if is_hot %}
+      <h1>🚨 Lead Urgent Détecté</h1>
+      <p>Nouveau lead chaud qualifié par l'IA - Action immédiate requise</p>
+      {% else %}
+      <h1>📋 Nouveau Lead</h1>
+      <p>Lead qualifié par l'IA</p>
+      {% endif %}
+    </div>
+
+    <div class="content">
+      <div class="section">
+        <h3>👤 Contact
+          <span class="priority-badge">
+            {% if is_hot %}URGENT{% else %}Standard{% endif %}
+          </span>
+        </h3>
+        <p><strong>Nom :</strong> {{ lead.nom }} {{ lead.prenom or '' }}</p>
+        <p><strong>Email :</strong> <a href="mailto:{{ lead.email }}">{{ lead.email }}</a></p>
+        <p><strong>Téléphone :</strong> <a href="tel:{{ lead.telephone }}">{{ lead.telephone }}</a></p>
+      </div>
+
+      <div class="section">
+        <h3>🏠 Projet</h3>
+        <p><strong>Type :</strong> {{ lead.type_projet }}</p>
+        {% if lead.surface %}
+        <p><strong>Surface :</strong> {{ lead.surface }} m²</p>
+        {% endif %}
+        <p><strong>Adresse :</strong> {{ lead.adresse or 'Non spécifiée' }}{% if lead.code_postal %}, {{ lead.code_postal }}{% endif %}{% if lead.ville %} {{ lead.ville }}{% endif %}</p>
+        {% if lead.budget_estime %}
+        <p><strong>Budget estimé :</strong> {{ lead.budget_estime }} €</p>
+        {% endif %}
+        <p><strong>Délai :</strong> {{ lead.delai or 'Flexible' }}</p>
+        {% if lead.description %}
+        <p><strong>Description :</strong> {{ lead.description }}</p>
+        {% endif %}
+      </div>
+
+      <div class="score">
+        Score IA : {{ lead.score_qualification or 50 }}/100 | Urgence : {{ lead.urgence or 'moyenne' }}
+      </div>
+
+      {% if lead.ai_notes %}
+      <div class="section">
+        <h3>🤖 Recommandation IA</h3>
+        <p>{{ lead.ai_notes }}</p>
+        {% if lead.ai_segments %}
+        <p><strong>Segments :</strong> {{ lead.ai_segments }}</p>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div class="actions">
+        <a href="tel:{{ lead.telephone }}" class="button">📞 Appeler</a>
+        <a href="mailto:{{ lead.email }}" class="button">📧 Email</a>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>ToitureAI - Notification automatique</p>
+      <p style="font-size: 11px; color: #999;">
+        Lead reçu le {{ lead.created_at[:10] if lead.created_at else 'N/A' }} | Source : {{ lead.source or 'web' }}
+      </p>
+    </div>
+  </div>
+</body>
+</html>
