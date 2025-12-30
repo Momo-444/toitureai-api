@@ -312,8 +312,13 @@ class RapportService:
         # Agrege par client (email)
         clients: dict[str, dict] = {}
 
+        # Statuts
+        parse_statut = lambda d: str(d.get("statut", "")).lower()
+        PAID_STATUSES = ["paye", "payé", "payes", "payés", "paid"]
+        SIGNED_STATUSES = ["signe", "signé", "signed", "accepte", "accepté"] + PAID_STATUSES
+
         for d in devis:
-            if d.get("statut") not in ["signe", "paye"]:
+            if parse_statut(d) not in SIGNED_STATUSES:
                 continue
 
             email = d.get("client_email", "").lower()
