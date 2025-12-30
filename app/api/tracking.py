@@ -200,14 +200,12 @@ async def track_lead(
                 "derniere_interaction": now
             }
 
-            if score >= settings.hot_lead_threshold:
-                update_data.update({
-                    "statut": "chaud",
-                    "lead_chaud": True
-                })
-                logger.info(f"Lead {lead_id} passé en CHAUD (score: {score})")
-            else:
-                logger.info(f"Lead {lead_id} a cliqué mais score trop bas ({score}) → reste normal")
+            # Si le prospect clique, c'est un fort signal d'intérêt -> on passe en CHAUD direct
+            update_data.update({
+                "statut": "chaud",
+                "lead_chaud": True
+            })
+            logger.info(f"Lead {lead_id} a cliqué → Passage en CHAUD (Score: {score})")
 
             await lead_repo.update(lead_id, update_data)
             logger.info(f"Tracking click enregistré pour lead {lead_id}")

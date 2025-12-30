@@ -130,6 +130,9 @@ async def create_devis(
             f"Devis cree: {result['numero']} pour lead {payload.lead_id}"
         )
 
+        # Update statut lead -> devis_envoye
+        await lead_repo.update(payload.lead_id, {"statut": "devis_envoye"})
+
         return DevisResponse.success(
             devis_id=result["devis_id"],
             numero=result["numero"],

@@ -265,11 +265,12 @@ class LeadCreate(BaseModel):
             "source": self.source,
             "statut": self.statut,
             # Colonnes ajoutees par migration (optionnelles)
-            "budget": self.budget_estime,
+            "budget_estime": self.budget_estime,
             "delai": self.delai,
             "contraintes": None,
         }
         # Retire les valeurs None pour eviter les erreurs si colonnes pas encore creees
+        # MAIS on garde budget s'il est present (0 est falsy mais on veut le garder)
         return {k: v for k, v in data.items() if v is not None}
 
 
