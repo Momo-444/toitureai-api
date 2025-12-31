@@ -34,6 +34,7 @@ DevisStatut = Literal[
     "envoye",
     "consulte",
     "signe",
+    "paye",
     "refuse",
     "expire",
 ]

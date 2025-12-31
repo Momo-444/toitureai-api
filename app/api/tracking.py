@@ -200,15 +200,13 @@ async def track_lead(
                 "derniere_interaction": now
             }
 
-            # Si le prospect clique, c'est un fort signal d'intérêt -> on passe en CHAUD direct
-            # 2025-12-30: Score boosté à 100.
-            # FIX: On ne force PAS "lead_chaud": True car une contrainte DB (leads_lead_chaud_check) plante si conflictuelle.
-            # On laisse le trigger DB (s'il existe) ou la logique simple gérer le booléen via le score/statut.
+            # FIX: On ne force PLUS le statut "chaud" (supprime), mais on set le flag booléen et le score.
+            # Ainsi le lead reste dans son étape (ex: devis_envoye) mais est marqué FIRE 🔥
             update_data.update({
-                "statut": "chaud",
+                "lead_chaud": True, 
                 "score_qualification": 100
             })
-            logger.info(f"Lead {lead_id} a cliqué → Passage en CHAUD (Score forcé: 100, lead_chaud non forcé)")
+            logger.info(f"Lead {lead_id} a cliqué → Flag lead_chaud=True + Score=100 (Statut inchangé)")
 
             await lead_repo.update(lead_id, update_data)
             logger.info(f"Tracking click enregistré pour lead {lead_id}")

@@ -27,15 +27,7 @@ from pydantic import (
 
 
 # === Types ===
-LeadStatut = Literal[
-    "nouveau",
-    "contacte",
-    "qualifie",
-    "devis_envoye",
-    "accepte",
-    "refuse",
-    "perdu",
-    "chaud"
+    "perdu"
 ]
 
 Urgence = Literal["faible", "moyenne", "haute"]
