@@ -27,6 +27,13 @@ from pydantic import (
 
 
 # === Types ===
+LeadStatut = Literal[
+    "nouveau",
+    "contacte",
+    "qualifie",
+    "devis_envoye",
+    "accepte",
+    "refuse",
     "perdu"
 ]
 
