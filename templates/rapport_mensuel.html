@@ -34,7 +34,7 @@
     .header {
       background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
       color: white;
-      padding: 30px;
+      padding: 40px 30px;
       border-radius: 12px;
       margin-bottom: 32px;
       box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2);
@@ -51,7 +51,7 @@
     }
 
     .header h1 {
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 700;
       margin-bottom: 8px;
       letter-spacing: -0.5px;
@@ -72,11 +72,11 @@
       padding-top: 12px;
     }
 
-    /* KPI Cards Grid */
+    /* KPI Cards Grid - AMÉLIORATION MAJEURE */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
       margin-bottom: 32px;
     }
 
@@ -84,15 +84,20 @@
       background: white;
       border: 1px solid #e2e8f0;
       border-radius: 12px;
-      padding: 20px;
+      padding: 24px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
       position: relative;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      min-height: 130px;
-      /* Fix pour eviter chevauchement */
+      gap: 12px;
+      min-height: 150px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     .kpi-card::before {
@@ -106,30 +111,40 @@
     }
 
     .kpi-label {
-      font-size: 11px;
+      font-size: 12px;
       color: #64748b;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       font-weight: 600;
-      margin-bottom: 8px;
+      line-height: 1.4;
     }
 
     .kpi-value {
-      font-size: 20px;
-      /* Reduit legerement pour eviter overflow */
+      font-size: 28px;
       font-weight: 700;
       color: #1e293b;
       line-height: 1.2;
-      margin-bottom: 8px;
-      word-break: break-all;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+
+    /* Responsive font size pour KPI values */
+    @media (max-width: 1200px) {
+      .kpi-value {
+        font-size: 24px;
+      }
     }
 
     .kpi-trend {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 500;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px solid #f1f5f9;
     }
 
     .kpi-trend.positive {
@@ -140,12 +155,16 @@
       color: #ef4444;
     }
 
+    .kpi-trend-icon {
+      font-size: 14px;
+    }
+
     /* Section */
     .section {
       background: white;
       border: 1px solid #e2e8f0;
       border-radius: 12px;
-      padding: 24px;
+      padding: 28px;
       margin-bottom: 24px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
       page-break-inside: avoid;
@@ -155,84 +174,95 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
       border-bottom: 2px solid #e2e8f0;
     }
 
     .section-title {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 700;
       color: #1e293b;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     .section-icon {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       background: linear-gradient(135deg, #3b82f6, #60a5fa);
       border-radius: 8px;
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 18px;
+      flex-shrink: 0;
     }
 
     /* Stats Grid for sections */
     .stats-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-      margin: 20px 0;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
     }
 
     .stat-item {
-      padding: 16px;
+      padding: 20px;
       background: #f8fafc;
       border-radius: 8px;
       border-left: 4px solid #3b82f6;
+      transition: background 0.2s;
+    }
+
+    .stat-item:hover {
+      background: #f1f5f9;
     }
 
     .stat-label {
       font-size: 12px;
       color: #64748b;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
       font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
 
     .stat-value {
-      font-size: 18px;
+      font-size: 24px;
       font-weight: 700;
       color: #1e293b;
+      line-height: 1.2;
     }
 
     /* Progress Bars */
     .progress-container {
-      margin: 12px 0;
+      margin: 20px 0;
     }
 
     .progress-label {
       display: flex;
       justify-content: space-between;
-      font-size: 12px;
-      margin-bottom: 6px;
+      font-size: 13px;
+      margin-bottom: 8px;
       color: #64748b;
+      font-weight: 500;
     }
 
     .progress-bar-bg {
       width: 100%;
-      height: 6px;
+      height: 8px;
       background: #e2e8f0;
-      border-radius: 3px;
+      border-radius: 4px;
       overflow: hidden;
     }
 
     .progress-bar-fill {
       height: 100%;
-      border-radius: 3px;
+      border-radius: 4px;
+      transition: width 0.3s ease;
     }
 
     /* Tables */
@@ -240,44 +270,52 @@
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
-      margin: 12px 0;
-      font-size: 13px;
+      margin: 16px 0;
+      font-size: 14px;
     }
 
     .data-table th {
       background: #f8fafc;
-      padding: 10px 12px;
+      padding: 12px 16px;
       text-align: left;
       font-size: 11px;
       font-weight: 600;
       color: #64748b;
       text-transform: uppercase;
       border-bottom: 2px solid #e2e8f0;
+      letter-spacing: 0.5px;
     }
 
     .data-table td {
-      padding: 10px 12px;
-      border-bottom: 1px solid #e2e8f0;
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
     }
 
     .data-table tr:last-child td {
       border-bottom: none;
     }
 
+    .data-table tbody tr:hover {
+      background: #f8fafc;
+    }
+
     .amount {
       text-align: right;
       font-family: 'Monaco', 'Courier New', monospace;
       font-weight: 600;
+      font-size: 14px;
     }
 
     /* Badges */
     .badge {
       display: inline-block;
-      padding: 4px 8px;
+      padding: 6px 12px;
       border-radius: 12px;
       font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .badge-success {
@@ -302,16 +340,75 @@
 
     /* Footer */
     .footer {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #e2e8f0;
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 2px solid #e2e8f0;
       text-align: center;
       color: #64748b;
-      font-size: 11px;
+      font-size: 12px;
+    }
+
+    .footer p {
+      margin: 4px 0;
     }
 
     .page-break {
       page-break-before: always;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 40px;
+      color: #94a3b8;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .section {
+        padding: 20px;
+      }
+
+      .data-table {
+        font-size: 12px;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 10px 12px;
+      }
+    }
+
+    /* Print optimization */
+    @media print {
+      .kpi-card:hover {
+        transform: none;
+      }
+
+      .stat-item:hover {
+        background: #f8fafc;
+      }
+
+      .data-table tbody tr:hover {
+        background: transparent;
+      }
     }
   </style>
 </head>
@@ -334,7 +431,7 @@
         <div class="kpi-value">{{ lead_kpis.total }}</div>
         <div class="kpi-trend positive">
           <span class="kpi-trend-icon">📈</span>
-          Activité mensuelle
+          <span>Activité mensuelle</span>
         </div>
       </div>
 
@@ -343,7 +440,7 @@
         <div class="kpi-value">{{ lead_kpis.taux_conversion }}%</div>
         <div class="kpi-trend {{ 'positive' if lead_kpis.taux_conversion >= 10 else 'negative' }}">
           <span class="kpi-trend-icon">🎯</span>
-          Objectif > 10%
+          <span>Objectif > 10%</span>
         </div>
       </div>
 
@@ -352,7 +449,7 @@
         <div class="kpi-value">{{ financial_kpis.ca_mensuel_formatted }}</div>
         <div class="kpi-trend positive">
           <span class="kpi-trend-icon">💰</span>
-          Total Signé & Payé
+          <span>Total Signé & Payé</span>
         </div>
       </div>
 
@@ -361,7 +458,7 @@
         <div class="kpi-value">{{ financial_kpis.panier_moyen_formatted }}</div>
         <div class="kpi-trend positive">
           <span class="kpi-trend-icon">📊</span>
-          Par devis signé
+          <span>Par devis signé</span>
         </div>
       </div>
     </div>
@@ -371,7 +468,7 @@
       <div class="section-header">
         <div class="section-title">
           <div class="section-icon">👥</div>
-          Performance Leads
+          <span>Performance Leads</span>
         </div>
         <span class="badge badge-success">Données consolidées</span>
       </div>
@@ -447,7 +544,7 @@
       <div class="section-header">
         <div class="section-title">
           <div class="section-icon">📜</div>
-          Performance Devis
+          <span>Performance Devis</span>
         </div>
         <span class="badge badge-success">Financier</span>
       </div>
@@ -516,7 +613,7 @@
       <div class="section-header">
         <div class="section-title">
           <div class="section-icon">🏆</div>
-          Top Clients du Mois
+          <span>Top Clients du Mois</span>
         </div>
       </div>
 
@@ -534,17 +631,17 @@
           {% for client in top_clients %}
           <tr>
             <td style="font-weight: 700; color: #3b82f6;">#{{ client.rang }}</td>
-            <td><strong>{{ client.nom }}</strong><br><span style="font-size:10px; color:#64748b;">{{ client.ville or ''
+            <td><strong>{{ client.nom }}</strong><br><span style="font-size:11px; color:#64748b;">{{ client.ville or ''
                 }}</span></td>
-            <td>{{ client.email }}</td>
+            <td style="color: #64748b;">{{ client.email }}</td>
             <td class="amount">{{ client.montant_formatted }}</td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
       {% else %}
-      <div style="text-align: center; padding: 40px; color: #94a3b8;">
-        <div style="font-size: 32px; margin-bottom: 8px;">📭</div>
+      <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
         <div>Aucun client top 10 ce mois-ci</div>
       </div>
       {% endif %}
@@ -555,7 +652,7 @@
       <div class="section-header">
         <div class="section-title">
           <div class="section-icon">📋</div>
-          Détail des Leads ({{ leads|length }})
+          <span>Détail des Leads ({{ leads|length }})</span>
         </div>
       </div>
       <table class="data-table">
@@ -571,9 +668,9 @@
           {% for lead in leads[:30] %}
           <tr>
             <td>{{ lead.date_formatted }}</td>
-            <td><strong>{{ lead.nom }}</strong><br><span style="font-size:10px; color:#64748b;">{{ lead.ville or '-'
+            <td><strong>{{ lead.nom }}</strong><br><span style="font-size:11px; color:#64748b;">{{ lead.ville or '-'
                 }}</span></td>
-            <td>
+            <td style="color: #64748b;">
               {{ lead.type_travaux or '-' }}
             </td>
             <td style="text-align: right;">
