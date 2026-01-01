@@ -162,19 +162,25 @@ async def track_lead(
         now = datetime.now(timezone.utc).isoformat()
 
         if type == "open":
+            logger.info(f"Traitement tracking OPEN pour lead {lead_id}")
+
+            lead = await lead_repo.get_by_id(lead_id)
+            current_count = (lead.get("email_ouvert_count", 0) or 0) if lead else 0
+            new_count = current_count + 1
+
             update_data = {
                 "email_ouvert": True,
                 "ouvert": "oui",
-                "derniere_interaction": now
+                "derniere_interaction": now,
+                "email_ouvert_count": new_count
             }
 
-            lead = await lead_repo.get_by_id(lead_id)
-            if lead:
-                current_count = lead.get("email_ouvert_count", 0) or 0
-                update_data["email_ouvert_count"] = current_count + 1
-
-            await lead_repo.update(lead_id, update_data)
-            logger.info(f"Tracking open enregistré pour lead {lead_id}")
+            try:
+                await lead_repo.update(lead_id, update_data)
+                logger.info(f"✅ Tracking open RÉUSSI pour lead {lead_id}: email_ouvert_count={new_count}")
+            except Exception as update_error:
+                logger.exception(f"❌ ERREUR mise à jour tracking open pour lead {lead_id}: {update_error}")
+                # On ne relance pas l'erreur pour le pixel, on retourne quand même le pixel
 
             return Response(
                 content=TRANSPARENT_PIXEL,
@@ -187,44 +193,54 @@ async def track_lead(
             )
 
         else:  # type == "click"
+            logger.info(f"Traitement tracking CLICK pour lead {lead_id}")
+
             lead = await lead_repo.get_by_id(lead_id)
             if not lead:
+                logger.error(f"Lead {lead_id} non trouvé pour tracking click")
                 raise HTTPException(status_code=404, detail="Lead non trouvé")
 
-            score = lead.get("score_qualification", 0) or 0
+            # Calculer le nouveau count
+            current_clic_count = lead.get("email_clic_count", 0) or 0
+            new_clic_count = current_clic_count + 1
 
             update_data = {
                 "ouvert": "oui",
                 "clique": "oui",
-                "email_clic_count": (lead.get("email_clic_count", 0) or 0) + 1,
-                "derniere_interaction": now
+                "email_clic_count": new_clic_count,
+                "derniere_interaction": now,
+                "lead_chaud": True,
+                "score_qualification": 100
             }
 
-            # FIX: On ne force PLUS le statut "chaud" (supprime), mais on set le flag booléen et le score.
-            # Ainsi le lead reste dans son étape (ex: devis_envoye) mais est marqué FIRE 🔥
-            update_data.update({
-                "lead_chaud": True, 
-                "score_qualification": 100
-            })
-            logger.info(f"Lead {lead_id} a cliqué → Flag lead_chaud=True + Score=100 (Statut inchangé)")
+            logger.info(f"Lead {lead_id} - Mise à jour: clique=oui, email_clic_count={new_clic_count}, lead_chaud=True")
 
-            await lead_repo.update(lead_id, update_data)
-            logger.info(f"Tracking click enregistré pour lead {lead_id}")
+            try:
+                result = await lead_repo.update(lead_id, update_data)
+                logger.info(f"✅ Tracking click RÉUSSI pour lead {lead_id}: {result}")
+            except Exception as update_error:
+                logger.exception(f"❌ ERREUR mise à jour tracking click pour lead {lead_id}: {update_error}")
+                raise
 
             html_content = THANK_YOU_HTML.replace("{website_url}", settings.website_url)
             return HTMLResponse(content=html_content)
 
     except Exception as e:
-        logger.exception(f"Erreur lors du tracking pour lead {lead_id}: {e}")
+        logger.exception(f"❌ EXCEPTION GLOBALE tracking pour lead {lead_id}, type={type}: {e}")
 
-        await error_handler.handle_error(
-            e,
-            workflow="lead_tracking",
-            node="track_lead",
-            send_alert=False
-        )
+        # Log l'erreur dans la base de données
+        try:
+            await error_handler.handle_error(
+                e,
+                workflow="lead_tracking",
+                node=f"track_lead_{type}",
+                send_alert=True  # Envoyer une alerte pour ces erreurs critiques
+            )
+        except Exception as log_error:
+            logger.exception(f"Impossible de loguer l'erreur: {log_error}")
 
         # Même en cas d'erreur, on renvoie une réponse propre à l'utilisateur
+        # Mais l'erreur est maintenant loguée et une alerte est envoyée
         if type == "open":
             return Response(content=TRANSPARENT_PIXEL, media_type="image/gif")
         else:
