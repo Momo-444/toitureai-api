@@ -19,7 +19,7 @@ from fastapi.responses import Response, HTMLResponse
 from app.core.config import settings
 from app.core.database import LeadRepository
 from app.core.error_handler import error_handler
-from app.services.hmac_service import verify_tracking_signature
+from app.services.hmac_service import verify_tracking_signature, hmac_service
 
 logger = logging.getLogger(__name__)
 
@@ -264,7 +264,69 @@ async def get_tracking_stats(lead_id: str):
         "email_ouvert_count": lead.get("email_ouvert_count", 0),
         "email_clic_count": lead.get("email_clic_count", 0),
         "lead_chaud": lead.get("lead_chaud", False),
+        "clique": lead.get("clique"),
         "statut": lead.get("statut"),
         "derniere_interaction": lead.get("derniere_interaction"),
         "created_at": lead.get("created_at")
     }
+
+
+@router.get(
+    "/debug/{lead_id}",
+    summary="Debug tracking - génère les URLs et teste la mise à jour",
+    description="Endpoint de diagnostic pour tester le tracking."
+)
+async def debug_tracking(lead_id: str, test_update: bool = False):
+    """
+    Endpoint de diagnostic pour le tracking.
+
+    - Affiche les URLs générées pour ce lead
+    - Optionnellement teste la mise à jour (test_update=true)
+    """
+    lead = await lead_repo.get_by_id(lead_id)
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead non trouvé")
+
+    # Générer les URLs de tracking
+    click_url, open_url = hmac_service.generate_tracking_urls(lead_id)
+
+    result = {
+        "lead_id": lead_id,
+        "api_base_url": settings.api_base_url,
+        "click_url": click_url,
+        "open_url": open_url,
+        "current_state": {
+            "clique": lead.get("clique"),
+            "email_clic_count": lead.get("email_clic_count", 0),
+            "lead_chaud": lead.get("lead_chaud", False),
+            "ouvert": lead.get("ouvert"),
+            "email_ouvert_count": lead.get("email_ouvert_count", 0),
+        }
+    }
+
+    # Test de mise à jour si demandé
+    if test_update:
+        try:
+            now = datetime.now(timezone.utc).isoformat()
+            current_clic_count = lead.get("email_clic_count", 0) or 0
+
+            update_data = {
+                "clique": "oui",
+                "email_clic_count": current_clic_count + 1,
+                "lead_chaud": True,
+                "derniere_interaction": now
+            }
+
+            updated = await lead_repo.update(lead_id, update_data)
+            result["test_update"] = {
+                "success": True,
+                "updated_data": update_data,
+                "result": updated
+            }
+        except Exception as e:
+            result["test_update"] = {
+                "success": False,
+                "error": str(e)
+            }
+
+    return result
