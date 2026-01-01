@@ -209,7 +209,7 @@ async def track_lead(
                 "clique": "oui",
                 "email_clic_count": new_clic_count,
                 "derniere_interaction": now,
-                "lead_chaud": True,
+                "lead_chaud": "oui",  # String, pas booléen (contrainte DB)
                 "score_qualification": 100
             }
 
@@ -313,7 +313,7 @@ async def debug_tracking(lead_id: str, test_update: bool = False):
             update_data = {
                 "clique": "oui",
                 "email_clic_count": current_clic_count + 1,
-                "lead_chaud": True,
+                "lead_chaud": "oui",  # String, pas booléen (contrainte DB)
                 "derniere_interaction": now
             }
 
