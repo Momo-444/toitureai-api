@@ -116,10 +116,10 @@ class DevisParams(BaseModel):
     """Parametres de calcul du devis."""
 
     tva: float = Field(
-        default=10.0,
+        default=20.0,
         ge=0,
         le=100,
-        description="Taux de TVA en pourcentage (10% pour travaux renovation)"
+        description="Taux de TVA en pourcentage (20% taux normal)"
     )
     validite_jours: int = Field(
         default=30,
@@ -267,7 +267,7 @@ class DevisCalcule(BaseModel):
     source: LigneSource = Field(default="openai")
 
     # Parametres
-    tva_pourcent: float = Field(default=10.0)
+    tva_pourcent: float = Field(default=20.0)
     validite_jours: int = Field(default=30)
 
     # Totaux calcules
@@ -303,7 +303,7 @@ class DevisCreate(BaseModel):
     # Montants
     montant_ht: float
     montant_ttc: float
-    tva_pourcent: float = Field(default=10.0)
+    tva_pourcent: float = Field(default=20.0)
 
     # Client (copie depuis lead)
     client_nom: str

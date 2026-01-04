@@ -514,7 +514,7 @@ class DevisService:
         lignes, notes, source = await self._generate_lignes(payload, lead)
 
         # 2. Calcule les totaux
-        tva = payload.params.tva if payload.params else 10.0
+        tva = payload.params.tva if payload.params else 20.0
         validite = payload.params.validite_jours if payload.params else 30
 
         devis_calcule = DevisCalcule(
