@@ -55,7 +55,11 @@ class RapportService:
     """
 
     RAPPORT_BUCKET = "rapports"
-    ADMIN_EMAIL = "contact@toitureai.fr"
+
+    @property
+    def ADMIN_EMAIL(self) -> str:
+        """Retourne l'email admin depuis les settings."""
+        return settings.admin_email
 
     def __init__(self):
         """Initialise le service."""
